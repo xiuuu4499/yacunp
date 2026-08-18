@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+from yacunp.comfyui_yacunp.libs import errors
 from yacunp.comfyui_yacunp.libs.custom_types import YacunpDictionary, YacunpLLMModel
 from yacunp.comfyui_yacunp.libs.local_llm import args, backends, config
 from yacunp.comfyui_yacunp.libs.local_llm.backends import lmstudio
@@ -97,6 +99,7 @@ def test_unload_without_model_still_cleans():
 
 
 def test_lmstudio_load_direct_no_network(monkeypatch):
+    monkeypatch.setattr(lmstudio, "ensure_model_loaded", lambda base_url, model_id: None)
     monkeypatch.setattr(backends, "get_backend", lambda backend_id: lmstudio)
     result = load_model_lmstudio.YacunpLoadModelLMStudio.execute(
         base_url="http://host:1/v1", model="my-model", multimodal=True
@@ -121,6 +124,7 @@ def test_lmstudio_load_applies_catalog_defaults(monkeypatch):
         "lmstudio": {},
     }
     monkeypatch.setattr(config, "load_catalog", lambda path=None: catalog)
+    monkeypatch.setattr(lmstudio, "ensure_model_loaded", lambda base_url, model_id: None)
     monkeypatch.setattr(backends, "get_backend", lambda backend_id: lmstudio)
     result = load_model_lmstudio.YacunpLoadModelLMStudio.execute(
         base_url="http://localhost:1234/v1",
@@ -131,3 +135,62 @@ def test_lmstudio_load_applies_catalog_defaults(monkeypatch):
     assert resolved.items["temperature"].value == 0.7
     assert resolved.items["top_p"].value == 0.95
     assert resolved.items["max_tokens"].value == 1024
+
+
+# --- ensure_model_loaded / _native_base unit tests ---
+
+def test_native_base_strips_v1_suffix():
+    assert lmstudio._native_base("http://localhost:1234/v1") == "http://localhost:1234/api/v1"
+    assert lmstudio._native_base("http://localhost:1234/v1/") == "http://localhost:1234/api/v1"
+    assert lmstudio._native_base("http://localhost:1234") == "http://localhost:1234/api/v1"
+
+
+def test_ensure_model_loaded_already_active(monkeypatch):
+    """Model with a loaded instance: no load request is issued."""
+    api_response = {
+        "data": [{"id": "my-model", "loaded_instances": [{"instance_id": "x"}]}]
+    }
+    requests = []
+
+    def fake_request(url, payload=None, timeout=120.0):
+        requests.append((url, payload))
+        return api_response
+
+    monkeypatch.setattr(lmstudio, "_request", fake_request)
+    lmstudio.ensure_model_loaded("http://localhost:1234/v1", "my-model")
+    assert len(requests) == 1  # only GET /api/v1/models, no POST
+
+
+def test_ensure_model_loaded_triggers_load(monkeypatch):
+    """Model present but not loaded: a POST to load is issued and validated."""
+    list_response = {"data": [{"id": "my-model", "loaded_instances": []}]}
+    load_response = {"data": {"loaded_instances": [{"instance_id": "y"}]}}
+    responses = [list_response, load_response]
+
+    def fake_request(url, payload=None, timeout=120.0):
+        return responses.pop(0)
+
+    monkeypatch.setattr(lmstudio, "_request", fake_request)
+    lmstudio.ensure_model_loaded("http://localhost:1234/v1", "my-model")
+
+
+def test_ensure_model_loaded_raises_if_load_fails(monkeypatch):
+    """Load response with no loaded_instances raises a clear error."""
+    list_response = {"data": [{"id": "my-model", "loaded_instances": []}]}
+    load_response = {"data": {}, "error": {"message": "out of memory"}}
+    responses = [list_response, load_response]
+
+    def fake_request(url, payload=None, timeout=120.0):
+        return responses.pop(0)
+
+    monkeypatch.setattr(lmstudio, "_request", fake_request)
+    with pytest.raises(errors.YacunpError, match="out of memory"):
+        lmstudio.ensure_model_loaded("http://localhost:1234/v1", "my-model")
+
+
+def test_ensure_model_loaded_raises_if_not_in_catalog(monkeypatch):
+    """Model not in native API response: clear error is raised."""
+    monkeypatch.setattr(lmstudio, "_request", lambda url, payload=None, timeout=120.0: {"data": []})
+    with pytest.raises(errors.YacunpError, match="not available"):
+        lmstudio.ensure_model_loaded("http://localhost:1234/v1", "missing-model")
+

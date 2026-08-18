@@ -1,8 +1,8 @@
 """LM Studio backend via its OpenAI-compatible local HTTP API.
 
 Uses only the Python standard library (``urllib``) so no extra dependency is
-required. LM Studio must already be running locally with the target model loaded
-or available; this backend never downloads anything.
+required. LM Studio must already be running locally; this backend will attempt
+to load the target model via the native REST API if it is not already active.
 """
 
 from __future__ import annotations
@@ -33,14 +33,66 @@ def _request(url: str, payload: dict[str, Any] | None = None, timeout: float = 1
         ) from None
 
 
+def _native_base(openai_base_url: str) -> str:
+    """Derive the native REST API root from the OpenAI-compat base URL.
+
+    The OpenAI-compat endpoint is ``<host>/v1``; the native REST API lives at
+    ``<host>/api/v1``.  We strip a trailing ``/v1`` (or ``/v1/``) and append
+    ``/api/v1`` so that both ``http://localhost:1234/v1`` and a bare
+    ``http://localhost:1234`` end up at ``http://localhost:1234/api/v1``.
+    """
+    base = openai_base_url.rstrip("/")
+    if base.endswith("/v1"):
+        base = base[: -len("/v1")]
+    return f"{base}/api/v1"
+
+
 def list_models(base_url: str) -> list[str]:
     result = _request(f"{base_url}/models")
     return [entry.get("id") for entry in (result.get("data") or []) if entry.get("id")]
 
 
+def ensure_model_loaded(base_url: str, model_id: str, load_timeout: float = 300.0) -> None:
+    """Verify that *model_id* is active in LM Studio, loading it if necessary.
+
+    Uses the native REST API (``/api/v1/models``) which exposes per-model
+    ``loaded_instances``.  If the model is not present in the catalog at all an
+    error is raised immediately.  If it is present but has no loaded instances
+    a POST to ``/api/v1/models/load`` is issued and we wait for the response
+    (LM Studio blocks until the model is ready or returns an error).
+    """
+    native = _native_base(base_url)
+    result = _request(f"{native}/models")
+    model_entries = result.get("data") or []
+    match = None
+    for entry in model_entries:
+        if (entry.get("id") or entry.get("key")) == model_id:
+            match = entry
+            break
+    if match is None:
+        available = [entry.get("id") or entry.get("key") for entry in model_entries]
+        available_str = ", ".join(str(m) for m in available if m) or "(none)"
+        raise errors.YacunpError(
+            f"Model '{model_id}' is not available in LM Studio. "
+            f"Available models: {available_str}."
+        )
+    loaded_instances = match.get("loaded_instances") or []
+    if loaded_instances:
+        return  # already loaded
+    # Model is available but not loaded — ask LM Studio to load it.
+    response = _request(f"{native}/models/load", {"model": model_id}, timeout=load_timeout)
+    loaded = (response.get("data") or {}).get("loaded_instances") or []
+    if not loaded:
+        error_msg = (response.get("error") or {}).get("message") or "unknown error"
+        raise errors.YacunpError(
+            f"LM Studio failed to load model '{model_id}': {error_msg}."
+        )
+
+
 def load(resolved: config.ResolvedModel, load_args: dict[str, Any]) -> YacunpLLMModel:
     base_url = str(resolved.extra.get("base_url") or "http://localhost:1234/v1").rstrip("/")
     model_id = resolved.path or resolved.key
+    ensure_model_loaded(base_url, model_id)
     return YacunpLLMModel(
         backend="lmstudio",
         name=model_id,
@@ -52,6 +104,7 @@ def load(resolved: config.ResolvedModel, load_args: dict[str, Any]) -> YacunpLLM
 
 def load_direct(base_url: str, model_id: str, multimodal: bool) -> YacunpLLMModel:
     base_url = base_url.rstrip("/")
+    ensure_model_loaded(base_url, model_id)
     return YacunpLLMModel(
         backend="lmstudio",
         name=model_id,

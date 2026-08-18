@@ -382,8 +382,9 @@ and select a model it already exposes. Uses only the standard library.
 | Output | `model` | `YACUNP_LLM_MODEL` | The model handle. |
 | Output | `resolved_arguments` | `YACUNP_DICTIONARY` | Catalog defaults overlaid with supplied overrides. |
 
-**Errors:** raises if the server is unreachable, or if `model` is blank and the
-server reports no models.
+**Errors:** raises if the server is unreachable; if `model` is blank and the
+server reports no available models; if the specified `model` is not found in
+LM Studio's catalog; or if the load request fails.
 
 ```mermaid
 flowchart LR

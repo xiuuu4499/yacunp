@@ -48,3 +48,4 @@ class YacunpLLMModel:
     handle: Any = None
     config: dict[str, Any] = field(default_factory=dict)
     multimodal: bool = False
+    cache_key: str | None = None

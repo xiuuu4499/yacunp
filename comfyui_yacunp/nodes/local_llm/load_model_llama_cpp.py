@@ -5,7 +5,7 @@ from __future__ import annotations
 from comfy_api.latest import io
 
 from ...libs.custom_types import DictionaryType, LLMModelType
-from ...libs.local_llm import args, backends, config
+from ...libs.local_llm import args, backends, config, resource_cache
 
 
 def _model_options():
@@ -14,12 +14,23 @@ def _model_options():
 
 
 def load_model(model_key: str, override_args: dict) -> tuple:
+    cache_key = f"llama_cpp:{model_key}"
     catalog = config.load_catalog()
     resolved = config.resolve(catalog, model_key)
     merged = config.merge_args(resolved.defaults, override_args)
+
+    cached = resource_cache.get(cache_key)
+    if cached is not None and cached.handle is not None:
+        resolved_plain = dict(merged)
+        if cached.config.get("n_ctx"):
+            resolved_plain["n_ctx"] = cached.config["n_ctx"]
+        return cached, args.plain_to_dictionary(resolved_plain)
+
     load_args, _gen_args = config.split_args(merged)
     backend = backends.get_backend("llama_cpp")
     llm = backend.load(resolved, load_args)
+    llm.cache_key = cache_key
+    resource_cache.put(cache_key, llm)
     resolved_plain = dict(merged)
     if llm.config.get("n_ctx"):
         resolved_plain["n_ctx"] = llm.config["n_ctx"]
@@ -47,6 +58,11 @@ class YacunpLoadModelLlamaCpp(io.ComfyNode):
                 DictionaryType.Output("resolved_arguments"),
             ],
         )
+
+    @classmethod
+    def is_changed(cls, model, arguments=None) -> float | str:
+        cache_key = f"llama_cpp:{model}"
+        return cache_key if resource_cache.is_live(cache_key) else float("nan")
 
     @classmethod
     def execute(cls, model, arguments=None) -> io.NodeOutput:

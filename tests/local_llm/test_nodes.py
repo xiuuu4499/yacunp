@@ -194,3 +194,131 @@ def test_ensure_model_loaded_raises_if_not_in_catalog(monkeypatch):
     with pytest.raises(errors.YacunpError, match="not available"):
         lmstudio.ensure_model_loaded("http://localhost:1234/v1", "missing-model")
 
+
+# --- resource cache tests ---
+
+from yacunp.comfyui_yacunp.libs.local_llm import resource_cache  # noqa: E402
+
+
+@pytest.fixture(autouse=False)
+def _clear_cache():
+    """Isolate tests by clearing the resource cache before and after each test."""
+    resource_cache._cache.clear()
+    yield
+    resource_cache._cache.clear()
+
+
+def test_llama_cpp_load_registers_in_resource_cache(monkeypatch, _clear_cache):
+    catalog = {
+        "models": {
+            "m": {
+                "backend": "llama_cpp",
+                "path": "/x.gguf",
+                "defaults": {"n_ctx": 4096, "temperature": 0.5},
+            }
+        },
+        "lmstudio": {},
+    }
+    monkeypatch.setattr(config, "load_catalog", lambda path=None: catalog)
+
+    class _FakeLoader:
+        def load(self, resolved, load_args):
+            return YacunpLLMModel(
+                backend="llama_cpp", name=resolved.key, handle=object(),
+                config={"n_ctx": 4096},
+            )
+
+    monkeypatch.setattr(backends, "get_backend", lambda backend_id: _FakeLoader())
+
+    result = load_model_llama_cpp.YacunpLoadModelLlamaCpp.execute(model="m")
+    llm, _ = result.args
+    assert resource_cache.is_live("llama_cpp:m")
+    assert resource_cache.get("llama_cpp:m") is llm
+    assert llm.cache_key == "llama_cpp:m"
+
+
+def test_unload_invalidates_resource_cache(monkeypatch, _clear_cache):
+    model = YacunpLLMModel(
+        backend="llama_cpp", name="m", handle=object(), cache_key="llama_cpp:m"
+    )
+    resource_cache.put("llama_cpp:m", model)
+    assert resource_cache.is_live("llama_cpp:m")
+
+    monkeypatch.setattr(backends, "get_backend", lambda backend_id: type("B", (), {"unload": lambda self, m: None})())
+    unload_model.YacunpUnloadModel.execute(model=model)
+
+    assert not resource_cache.is_live("llama_cpp:m")
+    assert resource_cache.get("llama_cpp:m") is None
+
+
+def test_llama_cpp_is_changed_returns_nan_when_not_live(_clear_cache):
+    result = load_model_llama_cpp.YacunpLoadModelLlamaCpp.is_changed(model="m")
+    import math
+    assert math.isnan(result)
+
+
+def test_llama_cpp_is_changed_returns_stable_key_when_live(_clear_cache):
+    model = YacunpLLMModel(backend="llama_cpp", name="m", handle=object())
+    resource_cache.put("llama_cpp:m", model)
+    result = load_model_llama_cpp.YacunpLoadModelLlamaCpp.is_changed(model="m")
+    assert result == "llama_cpp:m"
+
+
+def test_lmstudio_load_registers_in_resource_cache(monkeypatch, _clear_cache):
+    monkeypatch.setattr(lmstudio, "ensure_model_loaded", lambda base_url, model_id: None)
+    monkeypatch.setattr(backends, "get_backend", lambda backend_id: lmstudio)
+    result = load_model_lmstudio.YacunpLoadModelLMStudio.execute(
+        base_url="http://host:1/v1", model="my-model", multimodal=False
+    )
+    llm, _ = result.args
+    cache_key = "lmstudio:http://host:1/v1:my-model"
+    assert resource_cache.is_live(cache_key)
+    assert resource_cache.get(cache_key) is llm
+    assert llm.cache_key == cache_key
+
+
+def test_lmstudio_is_changed_returns_nan_for_blank_model(_clear_cache):
+    import math
+    result = load_model_lmstudio.YacunpLoadModelLMStudio.is_changed(
+        base_url="http://host:1/v1", model=""
+    )
+    assert math.isnan(result)
+
+
+def test_lmstudio_is_changed_returns_stable_key_when_live(_clear_cache):
+    model = YacunpLLMModel(backend="lmstudio", name="my-model", handle={"x": 1})
+    cache_key = "lmstudio:http://host:1/v1:my-model"
+    resource_cache.put(cache_key, model)
+    result = load_model_lmstudio.YacunpLoadModelLMStudio.is_changed(
+        base_url="http://host:1/v1", model="my-model"
+    )
+    assert result == cache_key
+
+
+def test_llama_cpp_reuses_cached_handle(monkeypatch, _clear_cache):
+    """Second execute() call returns the same live handle from cache, not a new load."""
+    catalog = {
+        "models": {
+            "m": {"backend": "llama_cpp", "path": "/x.gguf", "defaults": {"n_ctx": 2048}}
+        },
+        "lmstudio": {},
+    }
+    monkeypatch.setattr(config, "load_catalog", lambda path=None: catalog)
+    load_calls = []
+
+    class _FakeLoader:
+        def load(self, resolved, load_args):
+            load_calls.append(1)
+            return YacunpLLMModel(
+                backend="llama_cpp", name=resolved.key, handle=object(),
+                config={"n_ctx": 2048},
+            )
+
+    monkeypatch.setattr(backends, "get_backend", lambda backend_id: _FakeLoader())
+
+    r1 = load_model_llama_cpp.YacunpLoadModelLlamaCpp.execute(model="m")
+    r2 = load_model_llama_cpp.YacunpLoadModelLlamaCpp.execute(model="m")
+    assert r1.args[0] is r2.args[0]
+    assert len(load_calls) == 1
+
+

@@ -5,7 +5,7 @@ from __future__ import annotations
 from comfy_api.latest import io
 
 from ...libs.custom_types import DictionaryType, LLMModelType
-from ...libs.local_llm import args, backends
+from ...libs.local_llm import args, backends, resource_cache
 
 
 def _vram_cleanup() -> dict:
@@ -30,6 +30,8 @@ def unload(model=None) -> dict:
     name = None
     if model is not None:
         name = model.name
+        if model.cache_key:
+            resource_cache.invalidate(model.cache_key)
         backends.get_backend(model.backend).unload(model)
         freed = True
     return {"unloaded": freed, "model": name, **_vram_cleanup()}

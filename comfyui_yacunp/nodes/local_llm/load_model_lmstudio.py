@@ -6,7 +6,7 @@ from comfy_api.latest import io
 
 from ...libs import errors
 from ...libs.custom_types import DictionaryType, LLMModelType
-from ...libs.local_llm import args, backends, config
+from ...libs.local_llm import args, backends, config, resource_cache
 
 
 def load_model(base_url: str, model: str, multimodal: bool, override_args: dict) -> tuple:
@@ -20,7 +20,18 @@ def load_model(base_url: str, model: str, multimodal: bool, override_args: dict)
                 "LM Studio returned no models. Load a model in LM Studio first."
             )
         model_id = available[0]
+
+    cache_key = f"lmstudio:{base}:{model_id}"
+    cached = resource_cache.get(cache_key)
+    if cached is not None and cached.handle is not None:
+        catalog = config.load_catalog()
+        catalog_defaults = config.lmstudio_catalog_defaults(catalog, base, model_id)
+        resolved = args.plain_to_dictionary(config.merge_args(catalog_defaults, override_args))
+        return cached, resolved
+
     llm = backend.load_direct(base, model_id, bool(multimodal))
+    llm.cache_key = cache_key
+    resource_cache.put(cache_key, llm)
     catalog = config.load_catalog()
     catalog_defaults = config.lmstudio_catalog_defaults(catalog, base, model_id)
     resolved = args.plain_to_dictionary(config.merge_args(catalog_defaults, override_args))
@@ -63,6 +74,15 @@ class YacunpLoadModelLMStudio(io.ComfyNode):
                 DictionaryType.Output("resolved_arguments"),
             ],
         )
+
+    @classmethod
+    def is_changed(cls, base_url, model, multimodal=False, arguments=None) -> float | str:
+        model_id = str(model or "").strip()
+        if not model_id:
+            return float("nan")
+        base = str(base_url or "").rstrip("/")
+        cache_key = f"lmstudio:{base}:{model_id}"
+        return cache_key if resource_cache.is_live(cache_key) else float("nan")
 
     @classmethod
     def execute(cls, base_url, model, multimodal=False, arguments=None) -> io.NodeOutput:

@@ -29,16 +29,25 @@ def encode(value: Any, style: str = PRETTY) -> str:
     ``style`` is either ``"pretty"`` (2-space indented) or ``"single_line"``.
     Output is always properly escaped by :func:`json.dumps`.
     """
-    jsonable = to_jsonable(value)
-    if style == PRETTY:
-        return json.dumps(jsonable, ensure_ascii=False, indent=2, sort_keys=False)
-    if style == SINGLE_LINE:
-        return json.dumps(
-            jsonable, ensure_ascii=False, separators=(", ", ": "), sort_keys=False
+    if style not in STYLES:
+        raise errors.YacunpError(
+            f"Unknown JSON style '{style}'. Expected one of {', '.join(STYLES)}."
         )
-    raise errors.YacunpError(
-        f"Unknown JSON style '{style}'. Expected one of {', '.join(STYLES)}."
-    )
+    try:
+        jsonable = to_jsonable(value)
+        if style == PRETTY:
+            return json.dumps(
+                jsonable, ensure_ascii=False, indent=2, sort_keys=False, allow_nan=False
+            )
+        return json.dumps(
+            jsonable,
+            ensure_ascii=False,
+            separators=(", ", ": "),
+            sort_keys=False,
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as exc:
+        raise errors.YacunpError(f"Value cannot be encoded as JSON: {exc}") from exc
 
 
 def decode(text: str) -> Any:

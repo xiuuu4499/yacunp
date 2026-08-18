@@ -1,0 +1,62 @@
+{
+  "$schema_note": "Copy this file to 'local_models.json' and edit it. YACUNP never downloads models; every entry points at a file you already have on disk (llama.cpp) or a model your LM Studio server already exposes.",
+
+  "models": {
+    "Qwen2.5 7B Instruct (GGUF, text only)": {
+      "backend": "llama_cpp",
+      "path": "/models/llm/Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+      "multimodal": false,
+      "defaults": {
+        "n_ctx": 8192,
+        "n_gpu_layers": -1,
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "max_tokens": 1024
+      }
+    },
+
+    "Qwen2.5-VL 7B (GGUF, vision via mmproj)": {
+      "backend": "llama_cpp",
+      "path": "/models/llm/Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+      "mmproj": "/models/llm/Qwen2.5-VL-7B-Instruct-mmproj-f16.gguf",
+      "multimodal": true,
+      "chat_handler": "Qwen25VLChatHandler",
+      "defaults": {
+        "n_ctx": 16384,
+        "n_gpu_layers": -1,
+        "image_max_tokens": 4096,
+        "temperature": 0.6,
+        "max_tokens": 1024
+      }
+    },
+
+    "CPU-only small model (GGUF)": {
+      "backend": "llama_cpp",
+      "path": "/models/llm/tinyllama-1.1b-chat-Q4_K_M.gguf",
+      "multimodal": false,
+      "defaults": {
+        "n_ctx": 4096,
+        "n_gpu_layers": 0,
+        "n_threads": 8,
+        "temperature": 0.8,
+        "max_tokens": 512
+      }
+    },
+
+    "My LM Studio model": {
+      "backend": "lmstudio",
+      "base_url": "http://localhost:1234/v1",
+      "path": "qwen2.5-7b-instruct",
+      "multimodal": false,
+      "defaults": {
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "max_tokens": 1024
+      }
+    }
+  },
+
+  "lmstudio": {
+    "base_url": "http://localhost:1234/v1"
+  }
+}

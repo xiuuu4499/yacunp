@@ -12,9 +12,19 @@ EXPECTED_NODE_IDS = {
     "YACUNP_GetDictionaryValue",
     "YACUNP_GetDictionaryKeys",
     "YACUNP_FormatTextWithDictionary",
+    "YACUNP_SetDictionaryValue",
+    "YACUNP_CombineDictionaries",
     "YACUNP_MakeJSON",
     "YACUNP_ConvertJSON",
     "YACUNP_FormatJSON",
+    "YACUNP_MakeBasicLLMArguments",
+    "YACUNP_MakeAdvancedLLMArguments",
+    "YACUNP_LoadModelLlamaCpp",
+    "YACUNP_LoadModelLMStudio",
+    "YACUNP_SystemPromptPresets",
+    "YACUNP_GenerateText",
+    "YACUNP_UnloadModel",
+    "YACUNP_SaveText",
 }
 
 
@@ -40,4 +50,4 @@ def test_schema_valid(node):
 @pytest.mark.parametrize("node", all_nodes())
 def test_category_prefixes(node):
     category = node.define_schema().category
-    assert category in ("YACUNP/Dictionary", "YACUNP/JSON")
+    assert category in ("YACUNP/Dictionary", "YACUNP/JSON", "YACUNP/Local LLM", "YACUNP/IO")

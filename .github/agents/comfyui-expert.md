@@ -65,3 +65,17 @@ before answering instead of guessing:
   it registers and publishes correctly.
 - Keep changes minimal and idiomatic to ComfyUI; do not invent APIs that the
   skills do not document.
+
+## Sample workflows: prefer the regular canvas format
+
+When creating or editing example/sample workflow files, **always author the
+regular ComfyUI canvas (UI graph) format** — the LiteGraph JSON you get from
+*Workflow → Export* (with `nodes`, `links`, `groups`, `version`, per-node
+`widgets_values`, `inputs`, `outputs`, positions, etc.). This is what users load
+and edit on the canvas.
+
+- Only produce the **API (prompt) format** (the flat `{ id: { class_type,
+  inputs } }` shape from *Save (API Format)*) when the user **specifically
+  requests API format** (e.g. for `/prompt`, headless runs, or tests).
+- If unsure which the user wants, default to the regular canvas format.
+- Place example workflows in `example_workflows/` per the registry convention.

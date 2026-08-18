@@ -1,0 +1,492 @@
+{
+  "last_node_id": 10,
+  "last_link_id": 9,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "YACUNP_MakeBasicLLMArguments",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeBasicLLMArguments"
+      },
+      "widgets_values": [
+        1024,
+        0.6,
+        0.9,
+        1234,
+        16384,
+        -1
+      ],
+      "title": "Basic LLM Arguments"
+    },
+    {
+      "id": 2,
+      "type": "YACUNP_MakeAdvancedLLMArguments",
+      "pos": [
+        380,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeAdvancedLLMArguments"
+      },
+      "widgets_values": [
+        50,
+        0.02,
+        1.15,
+        0.1,
+        0.1,
+        1024,
+        0,
+        true,
+        4096,
+        "</end>"
+      ],
+      "title": "Advanced LLM Arguments"
+    },
+    {
+      "id": 3,
+      "type": "YACUNP_MakeJSON",
+      "pos": [
+        720,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "value_0",
+          "type": "*",
+          "link": 1
+        },
+        {
+          "name": "value_1",
+          "type": "*",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "links": [
+            3,
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeJSON"
+      },
+      "title": "Arguments -> JSON array"
+    },
+    {
+      "id": 4,
+      "type": "YACUNP_FormatJSON",
+      "pos": [
+        1060,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "link": 3,
+          "widget": {
+            "name": "json"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "links": [
+            4,
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_FormatJSON"
+      },
+      "widgets_values": [
+        "pretty"
+      ],
+      "title": "Format (pretty)"
+    },
+    {
+      "id": 5,
+      "type": "YACUNP_SaveText",
+      "pos": [
+        1400,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SaveText"
+      },
+      "widgets_values": [
+        "llm_arguments",
+        "json"
+      ],
+      "title": "Save pretty JSON"
+    },
+    {
+      "id": 6,
+      "type": "YACUNP_FormatJSON",
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "link": 5,
+          "widget": {
+            "name": "json"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_FormatJSON"
+      },
+      "widgets_values": [
+        "single_line"
+      ],
+      "title": "Format (single line)"
+    },
+    {
+      "id": 7,
+      "type": "YACUNP_SaveText",
+      "pos": [
+        380,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 6,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SaveText"
+      },
+      "widgets_values": [
+        "llm_arguments_min",
+        "json"
+      ],
+      "title": "Save single-line JSON"
+    },
+    {
+      "id": 8,
+      "type": "YACUNP_ConvertJSON",
+      "pos": [
+        720,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "link": 7,
+          "widget": {
+            "name": "json"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_ConvertJSON"
+      },
+      "widgets_values": [
+        "list"
+      ],
+      "title": "Parse JSON back to a value"
+    },
+    {
+      "id": 9,
+      "type": "YACUNP_MakeJSON",
+      "pos": [
+        1060,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "value_0",
+          "type": "*",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeJSON"
+      },
+      "title": "Re-encode parsed value"
+    },
+    {
+      "id": 10,
+      "type": "YACUNP_SaveText",
+      "pos": [
+        1400,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 9,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SaveText"
+      },
+      "widgets_values": [
+        "llm_arguments_roundtrip",
+        "json"
+      ],
+      "title": "Save round-trip JSON"
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      3,
+      0,
+      "*"
+    ],
+    [
+      2,
+      2,
+      0,
+      3,
+      1,
+      "*"
+    ],
+    [
+      3,
+      3,
+      0,
+      4,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      4,
+      0,
+      5,
+      0,
+      "STRING"
+    ],
+    [
+      5,
+      3,
+      0,
+      6,
+      0,
+      "STRING"
+    ],
+    [
+      6,
+      6,
+      0,
+      7,
+      0,
+      "STRING"
+    ],
+    [
+      7,
+      4,
+      0,
+      8,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      8,
+      0,
+      9,
+      0,
+      "*"
+    ],
+    [
+      9,
+      9,
+      0,
+      10,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

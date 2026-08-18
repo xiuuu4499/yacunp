@@ -21,6 +21,12 @@ flow.
   `{"__type__": "IMAGE", "shape": [...], "dtype": "..."}`.
 - **Type checking** — nodes that read a typed value verify the requested type
   matches the stored declared type. `ANY` matches every type.
+- **LLM model** (`YACUNP_LLM_MODEL`) — an opaque handle to a loaded local model
+  (a live `llama_cpp.Llama` instance or an LM Studio client descriptor). It is
+  passed between Local LLM nodes and is never serialized.
+- **Arguments / info dictionaries** — Local LLM nodes exchange their parameters
+  and diagnostics as ordinary `YACUNP_DICTIONARY` values, so any Dictionary node
+  can build, inspect, or combine them.
 
 ---
 
@@ -157,6 +163,55 @@ flowchart LR
   F --> O[text: STRING]
 ```
 
+### Set Dictionary Value — `YACUNP_SetDictionaryValue`
+
+**Purpose:** Insert or update one KV pair in a dictionary, returning a new
+dictionary (the input is not mutated).
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `dictionary` | `YACUNP_DICTIONARY` | Source dictionary. |
+| Input | `pair` | `YACUNP_KVPAIR` | Pair to set. |
+| Input | `on_conflict` | Combo | `replace` (default) or `throw_error`. |
+| Output | `dictionary` | `YACUNP_DICTIONARY` | Dictionary with the pair set. |
+
+**Errors:** raises when the key already exists and `on_conflict` is
+`throw_error`, or when `pair` is not a KV pair.
+
+```mermaid
+flowchart LR
+  D[dictionary: YACUNP_DICTIONARY] --> S[Set Dictionary Value]
+  P[pair: YACUNP_KVPAIR] --> S
+  C[on_conflict: Combo] --> S
+  S --> O[dictionary: YACUNP_DICTIONARY]
+```
+
+### Combine Dictionaries — `YACUNP_CombineDictionaries`
+
+**Purpose:** Merge two or more dictionaries into one. The `collision_mode`
+decides what happens when a key appears more than once.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `dictionaries` | Autogrow of `YACUNP_DICTIONARY` | Two or more dictionaries. |
+| Input | `collision_mode` | Combo | `throw_error`, `keep_first`, `keep_last`, `concatenate`, `list_combine_values`. |
+| Input | `separator` | `STRING` | Joiner for `concatenate` (default a space). |
+| Output | `dictionary` | `YACUNP_DICTIONARY` | Merged dictionary. |
+
+**Errors:** raises on a duplicate key when `collision_mode` is `throw_error`, or
+if a slot carries a value that is not a dictionary. `concatenate` produces a
+`STRING` value; `list_combine_values` produces an `ARRAY` value.
+
+```mermaid
+flowchart LR
+  D0[dict_0] --> C[Combine Dictionaries]
+  D1[dict_1] --> C
+  DN[dict_n ...] --> C
+  M[collision_mode: Combo] --> C
+  S[separator: STRING] --> C
+  C --> O[dictionary: YACUNP_DICTIONARY]
+```
+
 ---
 
 ## Category: `YACUNP/JSON`
@@ -222,3 +277,223 @@ flowchart LR
   FT[format: Combo] --> F
   F --> O[json: STRING]
 ```
+
+---
+
+## Category: `YACUNP/Local LLM`
+
+Nodes for running **local** LLMs (text and multimodal) from within a workflow.
+They work only with models you already have on disk (llama.cpp / GGUF) or that a
+running LM Studio server already exposes — **no model is ever downloaded**.
+Models are declared in `local_models.json` (copy `local_models.example.json` to
+start). Backends are imported lazily, so the pack loads even without
+`llama-cpp-python` installed; a clear error is raised only when a node actually
+runs.
+
+Typical wiring: build an argument dictionary → **Load Model** (outputs the model
+and its resolved arguments) → **Generate Text** (with an optional system prompt
+and images) → optionally **Unload Model**.
+
+### Make Basic LLM Arguments — `YACUNP_MakeBasicLLMArguments`
+
+**Purpose:** Build a dictionary of the parameters people tune most often, each
+with an explanatory tooltip.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `max_tokens` | `INT` | Max new tokens to generate (generation-time). |
+| Input | `temperature` | `FLOAT` | Sampling randomness (generation-time). |
+| Input | `top_p` | `FLOAT` | Nucleus sampling cutoff (generation-time). |
+| Input | `seed` | `INT` | Sampling seed; 0 = fresh each run (generation-time). |
+| Input | `n_ctx` | `INT` | Context window size (load-time). |
+| Input | `n_gpu_layers` | `INT` | Layers to offload to GPU (load-time). |
+| Output | `arguments` | `YACUNP_DICTIONARY` | The assembled arguments. |
+
+**Errors:** none.
+
+```mermaid
+flowchart LR
+  A["max_tokens, temperature, top_p,<br/>seed, n_ctx, n_gpu_layers"] --> M[Make Basic LLM Arguments]
+  M --> D[arguments: YACUNP_DICTIONARY]
+```
+
+### Make Advanced LLM Arguments — `YACUNP_MakeAdvancedLLMArguments`
+
+**Purpose:** Build a dictionary of the less common knobs, each with an
+explanatory tooltip.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `top_k` | `INT` | Top-K sampling (generation-time). |
+| Input | `min_p` | `FLOAT` | Minimum-probability cutoff (generation-time). |
+| Input | `repeat_penalty` | `FLOAT` | Repetition penalty (generation-time). |
+| Input | `presence_penalty` | `FLOAT` | Presence penalty (generation-time). |
+| Input | `frequency_penalty` | `FLOAT` | Frequency penalty (generation-time). |
+| Input | `n_batch` | `INT` | Prompt batch size (load-time). |
+| Input | `n_threads` | `INT` | CPU threads (load-time). |
+| Input | `flash_attn` | `BOOLEAN` | Enable FlashAttention (load-time). |
+| Input | `image_max_tokens` | `INT` | Per-image token budget for mmproj (load-time). |
+| Input | `stop` | `STRING` | Optional stop sequence (generation-time). |
+| Output | `arguments` | `YACUNP_DICTIONARY` | The assembled arguments. |
+
+**Errors:** none. Combine with Basic arguments via **Combine Dictionaries**.
+
+```mermaid
+flowchart LR
+  A["top_k, min_p, penalties,<br/>n_batch, n_threads, flash_attn,<br/>image_max_tokens, stop"] --> M[Make Advanced LLM Arguments]
+  M --> D[arguments: YACUNP_DICTIONARY]
+```
+
+### Load Model (llama.cpp) — `YACUNP_LoadModelLlamaCpp`
+
+**Purpose:** Load a local GGUF model with llama.cpp. Reads load-time keys from
+the (optional) arguments dictionary, overlaid on the config defaults, and reads
+known values (such as `n_ctx`) back from the loaded model.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `model` | Combo | Model keys from `local_models.json` (backend `llama_cpp`). |
+| Input | `arguments` | `YACUNP_DICTIONARY` | Optional overrides (load-time keys used). |
+| Output | `model` | `YACUNP_LLM_MODEL` | The loaded model handle. |
+| Output | `resolved_arguments` | `YACUNP_DICTIONARY` | Config defaults + overrides + read-back values. |
+
+**Errors:** raises if the model is not in the config, the file is missing, or
+`llama-cpp-python` is not installed.
+
+```mermaid
+flowchart LR
+  S[model: Combo] --> L["Load Model (llama.cpp)"]
+  A[arguments: YACUNP_DICTIONARY] --> L
+  L --> M[model: YACUNP_LLM_MODEL]
+  L --> R[resolved_arguments: YACUNP_DICTIONARY]
+```
+
+### Load Model (LM Studio) — `YACUNP_LoadModelLMStudio`
+
+**Purpose:** Point at a running LM Studio server (OpenAI-compatible local API)
+and select a model it already exposes. Uses only the standard library.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `base_url` | `STRING` | e.g. `http://localhost:1234/v1`. |
+| Input | `model` | `STRING` | Model id from `GET /v1/models`; blank = first available. |
+| Input | `multimodal` | `BOOLEAN` | Enable if the model accepts images. |
+| Input | `arguments` | `YACUNP_DICTIONARY` | Optional overrides. |
+| Output | `model` | `YACUNP_LLM_MODEL` | The model handle. |
+| Output | `resolved_arguments` | `YACUNP_DICTIONARY` | Catalog defaults overlaid with supplied overrides. |
+
+**Errors:** raises if the server is unreachable; if `model` is blank and the
+server reports no available models; if the specified `model` is not found in
+LM Studio's catalog; or if the load request fails.
+
+```mermaid
+flowchart LR
+  U[base_url: STRING] --> L["Load Model (LM Studio)"]
+  N[model: STRING] --> L
+  MM[multimodal: BOOLEAN] --> L
+  A[arguments: YACUNP_DICTIONARY] --> L
+  L --> M[model: YACUNP_LLM_MODEL]
+  L --> R[resolved_arguments: YACUNP_DICTIONARY]
+```
+
+### System Prompt Presets — `YACUNP_SystemPromptPresets`
+
+**Purpose:** Pick a ready-made system prompt grouped by purpose, optionally
+append extra instructions, or replace it entirely with a custom override.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `preset` | Combo | `Category :: Preset` options; extend via `system_prompts.json`. |
+| Input | `extra_instructions` | `STRING` (multiline) | Appended after the preset. |
+| Input | `custom_override` | `STRING` (multiline) | If non-empty, replaces the preset. |
+| Output | `system_prompt` | `STRING` | The resolved system prompt. |
+
+**Errors:** raises on an unknown preset option.
+
+```mermaid
+flowchart LR
+  P[preset: Combo] --> S[System Prompt Presets]
+  E[extra_instructions: STRING] --> S
+  O[custom_override: STRING] --> S
+  S --> T[system_prompt: STRING]
+```
+
+### Generate Text — `YACUNP_GenerateText`
+
+**Purpose:** Run text generation on a loaded model (llama.cpp or LM Studio),
+dispatching on the model's backend. Optional images enable multimodal models.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `model` | `YACUNP_LLM_MODEL` | The loaded model. |
+| Input | `prompt` | `STRING` (multiline) | The user prompt. |
+| Input | `system_prompt` | `STRING` (multiline) | Optional system prompt. |
+| Input | `arguments` | `YACUNP_DICTIONARY` | Optional; generation-time keys are used. |
+| Input | `image` | `IMAGE` | Optional image(s) for vision models. |
+| Input | `image2` | `IMAGE` | Optional second image / batch. |
+| Output | `text` | `STRING` | The generated text. |
+| Output | `info` | `YACUNP_DICTIONARY` | Diagnostics (backend, model, token counts, …). |
+
+**Errors:** raises if images are provided to a non-multimodal model, or if the
+backend/model is unavailable.
+
+```mermaid
+flowchart LR
+  M[model: YACUNP_LLM_MODEL] --> G[Generate Text]
+  P[prompt: STRING] --> G
+  SP[system_prompt: STRING] --> G
+  A[arguments: YACUNP_DICTIONARY] --> G
+  I["image / image2: IMAGE"] --> G
+  G --> T[text: STRING]
+  G --> N[info: YACUNP_DICTIONARY]
+```
+
+### Unload Model / VRAM Cleanup — `YACUNP_UnloadModel`
+
+**Purpose:** Free a loaded model and run a VRAM/RAM cleanup pass (garbage
+collection and, when available, a CUDA cache clear). Runs as an output node.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `model` | `YACUNP_LLM_MODEL` | Optional; model to unload. |
+| Input | `signal` | `ANY` | Optional; connect to sequence this after generation. |
+| Output | `info` | `YACUNP_DICTIONARY` | Cleanup diagnostics. |
+
+**Errors:** none in normal operation.
+
+```mermaid
+flowchart LR
+  M[model: YACUNP_LLM_MODEL] --> U[Unload Model / VRAM Cleanup]
+  S[signal: ANY] --> U
+  U --> I[info: YACUNP_DICTIONARY]
+```
+
+---
+
+## Category: `YACUNP/IO`
+
+### Save Text — `YACUNP_SaveText`
+
+**Purpose:** Write a string to a file in the ComfyUI output directory — for
+example generated text as `.txt`, or serialized JSON metadata as `.json`. Runs
+as an output node.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `text` | `STRING` (multiline) | Content to write. |
+| Input | `filename_prefix` | `STRING` | Base filename (sanitized to a bare name). |
+| Input | `extension` | `STRING` | File extension, e.g. `txt` or `json`. |
+| Output | `path` | `STRING` | Absolute path of the written file. |
+
+**Errors:** none in normal operation. The prefix/extension are sanitized to keep
+writes inside the output directory; an existing name gets a numeric suffix.
+
+```mermaid
+flowchart LR
+  T[text: STRING] --> S[Save Text]
+  FP[filename_prefix: STRING] --> S
+  E[extension: STRING] --> S
+  S --> P[path: STRING]
+```
+
+

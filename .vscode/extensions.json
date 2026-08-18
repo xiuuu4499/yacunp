@@ -4,6 +4,7 @@
         "ms-python.python",
         "donjayamanne.githistory",
         "yzhang.markdown-all-in-one",
-        "github.remotehub"
+        "github.remotehub",
+        "openai.chatgpt"
     ]
 }

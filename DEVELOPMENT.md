@@ -20,19 +20,22 @@ yacunp/
   comfyui_yacunp/
     __init__.py
     registration.py           # collects NODES from every category package
+    local_models.example.json # Local LLM model catalog template (copy to local_models.json)
     libs/                     # reusable, comfy_api-light logic
       custom_types.py         # io.Custom handles + payload dataclasses
       type_registry.py        # single source of truth for all types
       json_codec.py           # JSON encode/decode on top of the registry
       errors.py               # YacunpError + typed error helpers
+      local_llm/              # model catalog, arg specs, presets, lazy backends
     nodes/
       dictionary/             # one node per file; __init__ exports NODES
       json/                   # one node per file; __init__ exports NODES
+      local_llm/              # one node per file; __init__ exports NODES
   tests/
     conftest.py               # installs the comfy_api stub, sets sys.path
     stubs/comfy_api/          # minimal io surface for imports + schema
     libs/                     # registry + codec unit tests
-    dictionary/, json/        # one test module per node
+    dictionary/, json/, local_llm/  # one test module per node
     test_registration.py      # every node imports, ids unique, schema valid
 ```
 
@@ -74,6 +77,13 @@ pip install -r requirements-dev.txt
 
 Runtime code depends only on the Python standard library and APIs bundled with
 ComfyUI, so `requirements.txt` is intentionally empty.
+
+The `YACUNP/Local LLM` nodes optionally use `llama-cpp-python` (install the
+`llama` extra: `pip install -e ".[llama]"`, ideally a vision-capable build for
+multimodal models). The LM Studio nodes use only the standard library. Backends
+are imported lazily, so the pack loads without these installed and raises a clear
+error only when a node actually runs. Models are never downloaded — configure
+local paths in `local_models.json` (copy `local_models.example.json`).
 
 ## Running the checks
 

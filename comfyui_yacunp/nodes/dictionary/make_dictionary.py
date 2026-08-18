@@ -27,8 +27,11 @@ def _iter_pairs(slots):
             yield value
         elif isinstance(value, (list, tuple)):
             for item in value:
-                if isinstance(item, YacunpKVPair):
-                    yield item
+                if not isinstance(item, YacunpKVPair):
+                    raise errors.YacunpError(
+                        "Make Dictionary inputs must be YACUNP_KVPAIR values."
+                    )
+                yield item
         else:
             raise errors.YacunpError(
                 "Make Dictionary inputs must be YACUNP_KVPAIR values."

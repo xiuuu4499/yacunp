@@ -52,7 +52,11 @@ def encode(value: Any, style: str = PRETTY) -> str:
 
 def decode(text: str) -> Any:
     """Parse JSON ``text`` into nested Python data, raising ``YacunpError``."""
+
+    def reject_constant(constant: str) -> None:
+        raise ValueError(f"non-finite numeric constant '{constant}'")
+
     try:
-        return json.loads(text)
-    except (json.JSONDecodeError, TypeError) as exc:
+        return json.loads(text, parse_constant=reject_constant)
+    except (json.JSONDecodeError, TypeError, ValueError) as exc:
         raise errors.invalid_json(str(exc)) from exc

@@ -28,7 +28,13 @@ while IFS=$'\t' read -r key repo ref; do
   else
     source="$repo"
   fi
-  copilot plugin marketplace add "$source" 2>&1 | grep -v 'already registered' || true
+marketplace_output="$(copilot plugin marketplace add "$source" 2>&1)" || {
+  if [[ "$marketplace_output" != *"already registered"* ]]; then
+    printf '%s\n' "$marketplace_output" >&2
+    exit 1
+  fi
+}
+printf '%s\n' "$marketplace_output" | grep -v 'already registered' || true
 done < <(jq -r '
   .extraKnownMarketplaces // {}
   | to_entries[]

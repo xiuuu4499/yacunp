@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "github.vscode-github-actions",
+        "ms-python.python",
+        "donjayamanne.githistory",
+        "yzhang.markdown-all-in-one",
+        "github.remotehub"
+    ]
+}

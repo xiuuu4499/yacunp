@@ -1,0 +1,3 @@
+# Runtime dependencies for the YACUNP node pack.
+# All logic uses the Python standard library plus APIs already bundled with
+# ComfyUI (torch, numpy, etc.), so there are no extra runtime requirements.

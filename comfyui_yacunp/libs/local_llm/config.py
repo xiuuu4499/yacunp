@@ -113,6 +113,23 @@ def resolve(catalog: dict[str, Any], key: str) -> ResolvedModel:
     )
 
 
+def lmstudio_catalog_defaults(
+    catalog: dict[str, Any], base_url: str, model_id: str
+) -> dict[str, Any]:
+    """Return defaults from the first lmstudio catalog entry matching base_url and model."""
+    models = catalog.get("models") or {}
+    norm_base = (base_url or "").rstrip("/")
+    norm_model = (model_id or "").strip()
+    for entry in models.values():
+        if not isinstance(entry, dict) or entry.get("backend") != "lmstudio":
+            continue
+        entry_base = str(entry.get("base_url") or "").rstrip("/")
+        entry_path = str(entry.get("path") or "").strip()
+        if entry_base == norm_base and entry_path == norm_model:
+            return dict(entry.get("defaults") or {})
+    return {}
+
+
 def lmstudio_base_url(catalog: dict[str, Any], override: str | None = None) -> str:
     if override:
         return override.rstrip("/")

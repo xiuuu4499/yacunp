@@ -105,3 +105,29 @@ def test_lmstudio_load_direct_no_network(monkeypatch):
     assert llm.backend == "lmstudio"
     assert llm.name == "my-model"
     assert llm.multimodal is True
+
+
+def test_lmstudio_load_applies_catalog_defaults(monkeypatch):
+    catalog = {
+        "models": {
+            "My LM Studio model": {
+                "backend": "lmstudio",
+                "base_url": "http://localhost:1234/v1",
+                "path": "qwen2.5-7b-instruct",
+                "multimodal": False,
+                "defaults": {"temperature": 0.7, "top_p": 0.95, "max_tokens": 1024},
+            }
+        },
+        "lmstudio": {},
+    }
+    monkeypatch.setattr(config, "load_catalog", lambda path=None: catalog)
+    monkeypatch.setattr(backends, "get_backend", lambda backend_id: lmstudio)
+    result = load_model_lmstudio.YacunpLoadModelLMStudio.execute(
+        base_url="http://localhost:1234/v1",
+        model="qwen2.5-7b-instruct",
+        multimodal=False,
+    )
+    _llm, resolved = result.args
+    assert resolved.items["temperature"].value == 0.7
+    assert resolved.items["top_p"].value == 0.95
+    assert resolved.items["max_tokens"].value == 1024

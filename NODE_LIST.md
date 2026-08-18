@@ -380,7 +380,7 @@ and select a model it already exposes. Uses only the standard library.
 | Input | `multimodal` | `BOOLEAN` | Enable if the model accepts images. |
 | Input | `arguments` | `YACUNP_DICTIONARY` | Optional overrides. |
 | Output | `model` | `YACUNP_LLM_MODEL` | The model handle. |
-| Output | `resolved_arguments` | `YACUNP_DICTIONARY` | Supplied overrides. |
+| Output | `resolved_arguments` | `YACUNP_DICTIONARY` | Catalog defaults overlaid with supplied overrides. |
 
 **Errors:** raises if the server is unreachable, or if `model` is blank and the
 server reports no models.

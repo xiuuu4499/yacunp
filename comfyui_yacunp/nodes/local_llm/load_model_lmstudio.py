@@ -21,7 +21,9 @@ def load_model(base_url: str, model: str, multimodal: bool, override_args: dict)
             )
         model_id = available[0]
     llm = backend.load_direct(base, model_id, bool(multimodal))
-    resolved = args.plain_to_dictionary(config.merge_args({}, override_args))
+    catalog = config.load_catalog()
+    catalog_defaults = config.lmstudio_catalog_defaults(catalog, base, model_id)
+    resolved = args.plain_to_dictionary(config.merge_args(catalog_defaults, override_args))
     return llm, resolved
 
 

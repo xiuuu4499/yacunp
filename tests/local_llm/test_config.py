@@ -112,3 +112,47 @@ def test_lmstudio_base_url_prefers_override(tmp_path):
     )
     assert config.lmstudio_base_url(catalog) == "http://cfg:1/v1"
     assert config.lmstudio_base_url(catalog, "http://over:2/v1/") == "http://over:2/v1"
+
+
+def test_lmstudio_catalog_defaults_returns_matching_entry(tmp_path):
+    catalog = config.load_catalog(
+        _write(
+            tmp_path,
+            {
+                "models": {
+                    "My LM Studio model": {
+                        "backend": "lmstudio",
+                        "base_url": "http://localhost:1234/v1",
+                        "path": "my-model",
+                        "multimodal": False,
+                        "defaults": {"temperature": 0.7, "max_tokens": 512},
+                    }
+                }
+            },
+        )
+    )
+    defaults = config.lmstudio_catalog_defaults(
+        catalog, "http://localhost:1234/v1", "my-model"
+    )
+    assert defaults == {"temperature": 0.7, "max_tokens": 512}
+
+
+def test_lmstudio_catalog_defaults_returns_empty_on_no_match(tmp_path):
+    catalog = config.load_catalog(
+        _write(
+            tmp_path,
+            {
+                "models": {
+                    "My LM Studio model": {
+                        "backend": "lmstudio",
+                        "base_url": "http://localhost:1234/v1",
+                        "path": "my-model",
+                        "defaults": {"temperature": 0.7},
+                    }
+                }
+            },
+        )
+    )
+    assert config.lmstudio_catalog_defaults(catalog, "http://localhost:1234/v1", "other") == {}
+    assert config.lmstudio_catalog_defaults(catalog, "http://other:1/v1", "my-model") == {}
+

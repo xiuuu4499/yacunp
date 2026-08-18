@@ -71,7 +71,7 @@ def load(resolved: config.ResolvedModel, load_args: dict[str, Any]) -> YacunpLLM
     chat_handler = None
     if resolved.multimodal and resolved.mmproj:
         mmproj_path = _resolve_path(resolved.mmproj, "mmproj")
-        chat_handler = _build_chat_handler(mmproj_path, load_args)
+        chat_handler = _build_chat_handler(mmproj_path, load_args, resolved.chat_handler)
         kwargs["chat_handler"] = chat_handler
 
     handle = Llama(**kwargs)
@@ -89,18 +89,27 @@ def load(resolved: config.ResolvedModel, load_args: dict[str, Any]) -> YacunpLLM
     )
 
 
-def _build_chat_handler(mmproj_path: str, load_args: dict[str, Any]):  # pragma: no cover
+_MULTIMODAL_CHAT_HANDLERS = ("Qwen3VLChatHandler", "Qwen25VLChatHandler", "Llava15ChatHandler")
+
+
+def _build_chat_handler(mmproj_path: str, load_args: dict[str, Any], handler_name: str | None = None):  # pragma: no cover
     from llama_cpp import llama_chat_format
 
-    handler_cls = None
-    for name in ("Qwen3VLChatHandler", "Qwen25VLChatHandler", "Llava15ChatHandler"):
-        handler_cls = getattr(llama_chat_format, name, None)
-        if handler_cls is not None:
-            break
-    if handler_cls is None:
+    if handler_name:
+        handler_cls = getattr(llama_chat_format, handler_name, None)
+        if handler_cls is None:
+            raise errors.YacunpError(
+                f"Chat handler '{handler_name}' is not available in this llama-cpp-python build. "
+                f"Known handlers in this build: "
+                + ", ".join(
+                    n for n in _MULTIMODAL_CHAT_HANDLERS if getattr(llama_chat_format, n, None) is not None
+                )
+                + ". Install a compatible vision-capable build or correct 'chat_handler' in your catalog."
+            )
+    else:
         raise errors.YacunpError(
-            "This llama-cpp-python build has no multimodal chat handler. Install a "
-            "vision-capable build to use mmproj models."
+            "Multimodal llama.cpp models require a 'chat_handler' field in the catalog entry. "
+            f"Set it to one of: {', '.join(_MULTIMODAL_CHAT_HANDLERS)} (whichever matches your model architecture)."
         )
     kwargs: dict[str, Any] = {"clip_model_path": mmproj_path, "verbose": False}
     if load_args.get("image_max_tokens"):

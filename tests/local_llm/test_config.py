@@ -62,8 +62,29 @@ def test_resolve_reads_fields(tmp_path):
     assert resolved.backend == "llama_cpp"
     assert resolved.mmproj == "/m/vl-mmproj.gguf"
     assert resolved.multimodal is True
+    assert resolved.chat_handler is None
     assert resolved.defaults["n_ctx"] == 8192
     assert resolved.extra["base_url"] == "http://x"
+
+
+def test_resolve_reads_chat_handler(tmp_path):
+    path = _write(
+        tmp_path,
+        {
+            "models": {
+                "vl": {
+                    "backend": "llama_cpp",
+                    "path": "/m/vl.gguf",
+                    "mmproj": "/m/vl-mmproj.gguf",
+                    "multimodal": True,
+                    "chat_handler": "Qwen25VLChatHandler",
+                    "defaults": {},
+                }
+            }
+        },
+    )
+    resolved = config.resolve(config.load_catalog(path), "vl")
+    assert resolved.chat_handler == "Qwen25VLChatHandler"
 
 
 def test_resolve_unknown_raises(tmp_path):

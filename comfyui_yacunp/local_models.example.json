@@ -20,6 +20,7 @@
       "path": "/models/llm/Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
       "mmproj": "/models/llm/Qwen2.5-VL-7B-Instruct-mmproj-f16.gguf",
       "multimodal": true,
+      "chat_handler": "Qwen25VLChatHandler",
       "defaults": {
         "n_ctx": 16384,
         "n_gpu_layers": -1,

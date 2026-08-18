@@ -51,6 +51,7 @@ class ResolvedModel:
     path: str | None
     mmproj: str | None
     multimodal: bool
+    chat_handler: str | None = None
     defaults: dict[str, Any] = field(default_factory=dict)
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -99,13 +100,14 @@ def resolve(catalog: dict[str, Any], key: str) -> ResolvedModel:
             f"Model '{key}' is not defined in {CONFIG_FILENAME}. "
             f"Add it there (see {EXAMPLE_FILENAME})."
         )
-    known = {"backend", "path", "mmproj", "multimodal", "defaults"}
+    known = {"backend", "path", "mmproj", "multimodal", "chat_handler", "defaults"}
     return ResolvedModel(
         key=key,
         backend=str(entry.get("backend") or "llama_cpp"),
         path=entry.get("path"),
         mmproj=entry.get("mmproj"),
         multimodal=bool(entry.get("multimodal", False)),
+        chat_handler=entry.get("chat_handler") or None,
         defaults=dict(entry.get("defaults") or {}),
         extra={k: v for k, v in entry.items() if k not in known},
     )

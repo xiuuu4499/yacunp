@@ -170,10 +170,11 @@ def _bool_text(value: Any) -> str:
 
 def _kvpair_from_jsonable(value: Any) -> Any:
     if isinstance(value, dict) and {"key", "type", "value"} <= set(value):
+        declared_type = str(value["type"])
         return YacunpKVPair(
             key=str(value["key"]),
-            declared_type=str(value["type"]),
-            value=value["value"],
+            declared_type=declared_type,
+            value=from_jsonable(declared_type, value["value"]),
         )
     return value
 

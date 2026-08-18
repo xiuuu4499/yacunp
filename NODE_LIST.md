@@ -467,3 +467,32 @@ flowchart LR
   U --> I[info: YACUNP_DICTIONARY]
 ```
 
+---
+
+## Category: `YACUNP/IO`
+
+### Save Text — `YACUNP_SaveText`
+
+**Purpose:** Write a string to a file in the ComfyUI output directory — for
+example generated text as `.txt`, or serialized JSON metadata as `.json`. Runs
+as an output node.
+
+| Direction | Name | Type | Notes |
+|---|---|---|---|
+| Input | `text` | `STRING` (multiline) | Content to write. |
+| Input | `filename_prefix` | `STRING` | Base filename (sanitized to a bare name). |
+| Input | `extension` | `STRING` | File extension, e.g. `txt` or `json`. |
+| Output | `path` | `STRING` | Absolute path of the written file. |
+
+**Errors:** none in normal operation. The prefix/extension are sanitized to keep
+writes inside the output directory; an existing name gets a numeric suffix.
+
+```mermaid
+flowchart LR
+  T[text: STRING] --> S[Save Text]
+  FP[filename_prefix: STRING] --> S
+  E[extension: STRING] --> S
+  S --> P[path: STRING]
+```
+
+

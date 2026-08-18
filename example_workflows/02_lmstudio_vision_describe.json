@@ -1,0 +1,378 @@
+{
+  "last_node_id": 7,
+  "last_link_id": 7,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ],
+      "title": "Load Image"
+    },
+    {
+      "id": 2,
+      "type": "YACUNP_LoadModelLMStudio",
+      "pos": [
+        380,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "YACUNP_LLM_MODEL",
+          "links": [
+            1,
+            6
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "resolved_arguments",
+          "type": "YACUNP_DICTIONARY",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_LoadModelLMStudio"
+      },
+      "widgets_values": [
+        "http://localhost:1234/v1",
+        "",
+        true
+      ],
+      "title": "Load Model (LM Studio)"
+    },
+    {
+      "id": 3,
+      "type": "YACUNP_MakeBasicLLMArguments",
+      "pos": [
+        720,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeBasicLLMArguments"
+      },
+      "widgets_values": [
+        300,
+        0.3,
+        0.95,
+        0,
+        8192,
+        -1
+      ],
+      "title": "Basic LLM Arguments"
+    },
+    {
+      "id": 4,
+      "type": "YACUNP_SystemPromptPresets",
+      "pos": [
+        1060,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "system_prompt",
+          "type": "STRING",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SystemPromptPresets"
+      },
+      "widgets_values": [
+        "Analysis :: Describe Image",
+        "",
+        ""
+      ],
+      "title": "System Prompt (Describe Image)"
+    },
+    {
+      "id": 5,
+      "type": "YACUNP_GenerateText",
+      "pos": [
+        1400,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "YACUNP_LLM_MODEL",
+          "link": 1
+        },
+        {
+          "name": "system_prompt",
+          "type": "STRING",
+          "link": 2,
+          "widget": {
+            "name": "system_prompt"
+          }
+        },
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "link": 3
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 4
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            5,
+            7
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "info",
+          "type": "YACUNP_DICTIONARY",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_GenerateText"
+      },
+      "widgets_values": [
+        "Describe this image in detail."
+      ],
+      "title": "Generate Text (vision)"
+    },
+    {
+      "id": 6,
+      "type": "YACUNP_SaveText",
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 5,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SaveText"
+      },
+      "widgets_values": [
+        "image_description",
+        "txt"
+      ],
+      "title": "Save description (.txt)"
+    },
+    {
+      "id": 7,
+      "type": "YACUNP_UnloadModel",
+      "pos": [
+        380,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "YACUNP_LLM_MODEL",
+          "link": 6
+        },
+        {
+          "name": "signal",
+          "type": "*",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "info",
+          "type": "YACUNP_DICTIONARY",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_UnloadModel"
+      },
+      "title": "Unload / VRAM cleanup"
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      5,
+      0,
+      "YACUNP_LLM_MODEL"
+    ],
+    [
+      2,
+      4,
+      0,
+      5,
+      1,
+      "STRING"
+    ],
+    [
+      3,
+      3,
+      0,
+      5,
+      2,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      4,
+      1,
+      0,
+      5,
+      3,
+      "IMAGE"
+    ],
+    [
+      5,
+      5,
+      0,
+      6,
+      0,
+      "STRING"
+    ],
+    [
+      6,
+      2,
+      0,
+      7,
+      0,
+      "YACUNP_LLM_MODEL"
+    ],
+    [
+      7,
+      5,
+      0,
+      7,
+      1,
+      "*"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

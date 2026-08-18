@@ -24,6 +24,7 @@ EXPECTED_NODE_IDS = {
     "YACUNP_SystemPromptPresets",
     "YACUNP_GenerateText",
     "YACUNP_UnloadModel",
+    "YACUNP_SaveText",
 }
 
 
@@ -49,4 +50,4 @@ def test_schema_valid(node):
 @pytest.mark.parametrize("node", all_nodes())
 def test_category_prefixes(node):
     category = node.define_schema().category
-    assert category in ("YACUNP/Dictionary", "YACUNP/JSON", "YACUNP/Local LLM")
+    assert category in ("YACUNP/Dictionary", "YACUNP/JSON", "YACUNP/Local LLM", "YACUNP/IO")

@@ -49,3 +49,10 @@ ComfyUI knowledge to be **executed by the comfyui-expert agent**. Note, per
 step, which `comfyui-node-*` skill(s) it relies on, so that whoever executes the
 plan hands those steps to comfyui-expert. Non-ComfyUI steps can proceed through
 the normal implementation agent.
+
+## Sample workflow format
+
+When a plan includes example/sample workflow files, default to the **regular
+ComfyUI canvas (UI graph) format**, and only plan for the **API (prompt) format**
+when the user specifically requests it (see the comfyui-expert agent's "Sample
+workflows" guidance). Call this out in the relevant plan step.

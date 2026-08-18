@@ -1,0 +1,970 @@
+{
+  "last_node_id": 19,
+  "last_link_id": 21,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "YACUNP_MakeKVPair",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "kvpair",
+          "type": "YACUNP_KVPAIR",
+          "links": [
+            4,
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeKVPair"
+      },
+      "widgets_values": [
+        "STRING",
+        "a cozy cabin"
+      ],
+      "title": "KV: subject"
+    },
+    {
+      "id": 2,
+      "type": "YACUNP_MakeKVPair",
+      "pos": [
+        380,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "kvpair",
+          "type": "YACUNP_KVPAIR",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeKVPair"
+      },
+      "widgets_values": [
+        "STRING",
+        "watercolor"
+      ],
+      "title": "KV: style"
+    },
+    {
+      "id": 3,
+      "type": "YACUNP_MakeKVPair",
+      "pos": [
+        720,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "kvpair",
+          "type": "YACUNP_KVPAIR",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeKVPair"
+      },
+      "widgets_values": [
+        "STRING",
+        "serene"
+      ],
+      "title": "KV: mood"
+    },
+    {
+      "id": 4,
+      "type": "YACUNP_MakeDictionary",
+      "pos": [
+        1060,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pair_0",
+          "type": "YACUNP_KVPAIR",
+          "link": 4
+        },
+        {
+          "name": "pair_1",
+          "type": "YACUNP_KVPAIR",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeDictionary"
+      },
+      "title": "Make Dictionary"
+    },
+    {
+      "id": 5,
+      "type": "YACUNP_SetDictionaryValue",
+      "pos": [
+        1400,
+        40
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "link": 6
+        },
+        {
+          "name": "pair",
+          "type": "YACUNP_KVPAIR",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            8,
+            9,
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SetDictionaryValue"
+      },
+      "widgets_values": [
+        "replace"
+      ],
+      "title": "Set mood"
+    },
+    {
+      "id": 6,
+      "type": "YACUNP_GetDictionaryKeys",
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keys",
+          "type": "STRING",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_GetDictionaryKeys"
+      },
+      "title": "Get Keys"
+    },
+    {
+      "id": 7,
+      "type": "YACUNP_GetDictionaryValue",
+      "pos": [
+        380,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_GetDictionaryValue"
+      },
+      "widgets_values": [
+        "STRING",
+        "subject"
+      ],
+      "title": "Get subject"
+    },
+    {
+      "id": 8,
+      "type": "YACUNP_FormatTextWithDictionary",
+      "pos": [
+        720,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            14
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_FormatTextWithDictionary"
+      },
+      "widgets_values": [
+        "A painting of {subject} in a {style} style, with a {mood} atmosphere.",
+        "{",
+        "}"
+      ],
+      "title": "Format prompt template"
+    },
+    {
+      "id": 9,
+      "type": "YACUNP_ReadKVPair",
+      "pos": [
+        1060,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pair",
+          "type": "YACUNP_KVPAIR",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "value",
+          "type": "*",
+          "links": [
+            20
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_ReadKVPair"
+      },
+      "widgets_values": [
+        "STRING"
+      ],
+      "title": "Read KV: subject"
+    },
+    {
+      "id": 10,
+      "type": "YACUNP_MakeBasicLLMArguments",
+      "pos": [
+        1400,
+        280
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeBasicLLMArguments"
+      },
+      "widgets_values": [
+        256,
+        0.8,
+        0.95,
+        0,
+        8192,
+        -1
+      ],
+      "title": "Basic LLM Arguments"
+    },
+    {
+      "id": 11,
+      "type": "YACUNP_LoadModelLlamaCpp",
+      "pos": [
+        40,
+        520
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "YACUNP_LLM_MODEL",
+          "links": [
+            13
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "resolved_arguments",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            16
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_LoadModelLlamaCpp"
+      },
+      "widgets_values": [
+        "Qwen2.5 7B Instruct (GGUF, text only)"
+      ],
+      "title": "Load Model (llama.cpp)"
+    },
+    {
+      "id": 12,
+      "type": "YACUNP_SystemPromptPresets",
+      "pos": [
+        380,
+        520
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "system_prompt",
+          "type": "STRING",
+          "links": [
+            15
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SystemPromptPresets"
+      },
+      "widgets_values": [
+        "Prompt Adjustment :: Enhance Prompt",
+        "",
+        ""
+      ],
+      "title": "System Prompt (Enhance Prompt)"
+    },
+    {
+      "id": 13,
+      "type": "YACUNP_GenerateText",
+      "pos": [
+        720,
+        520
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "YACUNP_LLM_MODEL",
+          "link": 13
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 14,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "system_prompt",
+          "type": "STRING",
+          "link": 15,
+          "widget": {
+            "name": "system_prompt"
+          }
+        },
+        {
+          "name": "arguments",
+          "type": "YACUNP_DICTIONARY",
+          "link": 16
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "info",
+          "type": "YACUNP_DICTIONARY",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_GenerateText"
+      },
+      "title": "Enhance the built prompt"
+    },
+    {
+      "id": 14,
+      "type": "YACUNP_SaveText",
+      "pos": [
+        1060,
+        520
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 17,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SaveText"
+      },
+      "widgets_values": [
+        "enhanced_prompt",
+        "txt"
+      ],
+      "title": "Save enhanced prompt (.txt)"
+    },
+    {
+      "id": 15,
+      "type": "YACUNP_MakeJSON",
+      "pos": [
+        1400,
+        520
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "value_0",
+          "type": "*",
+          "link": 18
+        },
+        {
+          "name": "value_1",
+          "type": "*",
+          "link": 19
+        },
+        {
+          "name": "value_2",
+          "type": "*",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json",
+          "type": "STRING",
+          "links": [
+            21
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_MakeJSON"
+      },
+      "title": "Debug: keys + values -> JSON"
+    },
+    {
+      "id": 16,
+      "type": "YACUNP_SaveText",
+      "pos": [
+        40,
+        760
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 21,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_SaveText"
+      },
+      "widgets_values": [
+        "dictionary_debug",
+        "json"
+      ],
+      "title": "Save dictionary debug (.json)"
+    },
+    {
+      "id": 17,
+      "type": "PrimitiveString",
+      "pos": [
+        40,
+        1000
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        "subject"
+      ],
+      "title": "key"
+    },
+    {
+      "id": 18,
+      "type": "PrimitiveString",
+      "pos": [
+        380,
+        1000
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        "style"
+      ],
+      "title": "key"
+    },
+    {
+      "id": 19,
+      "type": "PrimitiveString",
+      "pos": [
+        720,
+        1000
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        "mood"
+      ],
+      "title": "key"
+    }
+  ],
+  "links": [
+    [
+      1,
+      17,
+      0,
+      1,
+      0,
+      "STRING"
+    ],
+    [
+      2,
+      18,
+      0,
+      2,
+      0,
+      "STRING"
+    ],
+    [
+      3,
+      19,
+      0,
+      3,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      1,
+      0,
+      4,
+      0,
+      "YACUNP_KVPAIR"
+    ],
+    [
+      5,
+      2,
+      0,
+      4,
+      1,
+      "YACUNP_KVPAIR"
+    ],
+    [
+      6,
+      4,
+      0,
+      5,
+      0,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      7,
+      3,
+      0,
+      5,
+      1,
+      "YACUNP_KVPAIR"
+    ],
+    [
+      8,
+      5,
+      0,
+      6,
+      0,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      9,
+      5,
+      0,
+      7,
+      0,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      10,
+      5,
+      0,
+      8,
+      0,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      11,
+      1,
+      0,
+      9,
+      0,
+      "YACUNP_KVPAIR"
+    ],
+    [
+      12,
+      10,
+      0,
+      11,
+      0,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      13,
+      11,
+      0,
+      13,
+      0,
+      "YACUNP_LLM_MODEL"
+    ],
+    [
+      14,
+      8,
+      0,
+      13,
+      1,
+      "STRING"
+    ],
+    [
+      15,
+      12,
+      0,
+      13,
+      2,
+      "STRING"
+    ],
+    [
+      16,
+      11,
+      1,
+      13,
+      3,
+      "YACUNP_DICTIONARY"
+    ],
+    [
+      17,
+      13,
+      0,
+      14,
+      0,
+      "STRING"
+    ],
+    [
+      18,
+      6,
+      0,
+      15,
+      0,
+      "*"
+    ],
+    [
+      19,
+      7,
+      0,
+      15,
+      1,
+      "*"
+    ],
+    [
+      20,
+      9,
+      1,
+      15,
+      2,
+      "*"
+    ],
+    [
+      21,
+      15,
+      0,
+      16,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

@@ -3,10 +3,12 @@
 ## Install the Copilot CLI and plugins declared for this repository
 
 This repository declares Copilot plugins in
-[`.github/copilot/settings.json`](copilot/settings.json). Those plugins are
-**not installed automatically** — `enabledPlugins` only enables a plugin that is
-already installed. Two hook scripts handle the setup; run them at the start of
-every session, before starting any task:
+[`.github/copilot/settings.json`](copilot/settings.json). Supported Copilot
+clients — both the Copilot CLI and the cloud coding agent — read this file and
+auto-install every plugin whose `enabledPlugins` entry is `true`, so no manual
+setup is normally required. The two hook scripts below are a compatibility
+fallback for older, unsupported clients that do not honor `enabledPlugins`; run
+them only if the declared plugins are missing:
 
 1. Ensure an up-to-date Copilot CLI on `PATH`:
 
@@ -36,13 +38,12 @@ every session, before starting any task:
    ```
 
 These scripts only affect the environment they run in and do not persist to
-future sessions, so run them at the start of every session. Installing a plugin
-mid-session may not retroactively load its skills into an already-running
-session.
+future sessions, so run them only as a fallback when a client has not
+auto-installed the declared plugins. Installing a plugin mid-session may not
+retroactively load its skills into an already-running session.
 
 The scripts are also wired into
 [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json) as a
-`postStartCommand`, so a rebuilt dev container runs them automatically. Keep the
-installed plugins in sync with `.github/copilot/settings.json`: re-run
-`install-plugins.sh` after changing that file, and do not rely on the settings
-file alone to make a plugin's skills available.
+`postStartCommand`, so a rebuilt dev container runs them as a fallback. Keep the
+`enabledPlugins` entries in `.github/copilot/settings.json` up to date so
+supported clients auto-install the intended plugins.

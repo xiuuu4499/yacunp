@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "comfyui-custom-node-skills": {
+      "source": {
+        "source": "github",
+        "repo": "xiuuu4499/comfyui-custom-node-skills",
+        "ref": "adjusted-fork-urls"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "comfyui-custom-nodes@comfyui-custom-node-skills": true
+  }
+}

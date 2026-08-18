@@ -1,5 +1,24 @@
 # Copilot instructions
 
+## Commit and pull request naming
+
+All commit messages and pull request titles **must** follow the
+[Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/#specification).
+
+- Structure the summary line as `<type>[optional scope][optional !]: <description>`,
+  for example `feat: add URL adjustment step` or `fix(parser): handle empty input`.
+- Use a `type` that communicates intent. `feat` (a new feature) and `fix` (a bug
+  fix) are required to be supported; other common types include `build`, `chore`,
+  `ci`, `docs`, `style`, `refactor`, `perf`, and `test`.
+- An optional scope may be provided in parentheses after the type, e.g. `feat(api):`.
+- Use the description to summarize the change in the imperative mood, immediately
+  after the colon and a space.
+- A longer body may follow the summary line after one blank line, and one or more
+  footers may follow the body after another blank line.
+- Indicate a breaking change either with a `!` immediately before the colon
+  (e.g. `feat!:` or `feat(api)!:`) and/or a `BREAKING CHANGE:` footer describing
+  the break.
+
 ## Install the Copilot CLI and plugins declared for this repository
 
 This repository declares Copilot plugins in

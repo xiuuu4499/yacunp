@@ -25,23 +25,32 @@ fi
 
 echo "Copilot CLI is ${current:-missing}; expected ${expected:-unknown}."
 
-# Fall back to npm only when the active binary is the extension-bundled one.
+install_via_npm() {
+  npm install -g @github/copilot
+  npm_bin="$(npm prefix -g 2>/dev/null)/bin"
+  export PATH="${npm_bin}:${PATH}"
+  hash -r 2>/dev/null || true
+  # Persist the override so interactive terminals prefer the npm copy too.
+  marker="# copilot-cli-npm-path"
+  if ! grep -qF "$marker" "${HOME}/.bashrc" 2>/dev/null; then
+    printf '\n%s\nexport PATH="%s:$PATH"\n' "$marker" "$npm_bin" >> "${HOME}/.bashrc"
+  fi
+  echo "Now using $(which copilot) ($(version_of))."
+}
+
+# Fall back to npm when copilot is missing entirely or the active binary is the
+# extension-bundled copy that can't self-update.
 location="$(which copilot 2>/dev/null || true)"
 case "$location" in
   *github.copilot-chat*)
     echo "Active copilot is bundled with the Copilot Chat extension: ${location}"
-    npm install -g @github/copilot
-    npm_bin="$(npm prefix -g 2>/dev/null)/bin"
-    export PATH="${npm_bin}:${PATH}"
-    hash -r 2>/dev/null || true
-    # Persist the override so interactive terminals prefer the npm copy too.
-    marker="# copilot-cli-npm-path"
-    if ! grep -qF "$marker" "${HOME}/.bashrc" 2>/dev/null; then
-      printf '\n%s\nexport PATH="%s:$PATH"\n' "$marker" "$npm_bin" >> "${HOME}/.bashrc"
-    fi
-    echo "Now using $(which copilot) ($(version_of))."
+    install_via_npm
+    ;;
+  "")
+    echo "Copilot CLI is not installed; installing via npm."
+    install_via_npm
     ;;
   *)
-    echo "copilot resolves to ${location:-nothing}; leaving PATH unchanged." >&2
+    echo "copilot resolves to ${location}; leaving PATH unchanged." >&2
     ;;
 esac

@@ -1,2 +1,4 @@
 pytest>=8.0
 ruff>=0.6
+# Bundled with ComfyUI at runtime; needed here for the isolated CI import of the package entry point.
+typing_extensions>=4.0

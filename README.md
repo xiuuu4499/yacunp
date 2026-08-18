@@ -23,10 +23,11 @@ and a diagram — see **[NODE_LIST.md](NODE_LIST.md)**.
 
 ## Installation
 
-### Option A — ComfyUI-Manager
+### Option A — ComfyUI-Manager (after registry publication)
 
-Search for **YACUNP** in [ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager)
-and install it, then restart ComfyUI.
+Once YACUNP is published, search for **YACUNP** in
+[ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager), install it, and
+restart ComfyUI.
 
 ### Option B — Manual clone
 

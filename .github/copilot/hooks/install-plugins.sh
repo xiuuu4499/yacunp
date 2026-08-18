@@ -48,7 +48,7 @@ while IFS= read -r plugin; do
   # never picks up a new marketplace revision. Uninstall first to force a reinstall
   # from the freshly refreshed marketplace checkout.
   copilot plugin uninstall "$plugin" >/dev/null 2>&1 || true
-  copilot plugin install "$plugin" 2>&1 | grep -v 'already installed' || true
+  copilot plugin install "$plugin"
 done < <(jq -r '
   .enabledPlugins // {}
   | to_entries[]

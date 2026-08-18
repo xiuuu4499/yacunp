@@ -9,12 +9,21 @@ from ...libs.custom_types import DictionaryType
 
 
 def format_text(dictionary, text: str, prefix: str, suffix: str) -> str:
-    result = text
+    import re
+
+    replacements = {}
     for key, pair in dictionary.items.items():
         placeholder = f"{prefix}{key}{suffix}"
-        replacement = type_registry.to_text(pair.declared_type, pair.value)
-        result = result.replace(placeholder, replacement)
-    return result
+        if placeholder:
+            replacements[placeholder] = type_registry.to_text(
+                pair.declared_type, pair.value
+            )
+    if not replacements:
+        return text
+    pattern = re.compile(
+        "|".join(re.escape(item) for item in sorted(replacements, key=len, reverse=True))
+    )
+    return pattern.sub(lambda match: replacements[match.group(0)], text)
 
 
 class YacunpFormatTextWithDictionary(io.ComfyNode):

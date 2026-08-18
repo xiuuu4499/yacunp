@@ -16,6 +16,7 @@ from comfy_api.latest import io
 # Custom wire types. The UPPER_SNAKE strings are the stable io_type ids.
 KVPairType = io.Custom("YACUNP_KVPAIR")
 DictionaryType = io.Custom("YACUNP_DICTIONARY")
+LLMModelType = io.Custom("YACUNP_LLM_MODEL")
 
 
 @dataclass
@@ -32,3 +33,18 @@ class YacunpDictionary:
     """An ordered collection of :class:`YacunpKVPair` keyed by pair key."""
 
     items: OrderedDict[str, YacunpKVPair] = field(default_factory=OrderedDict)
+
+
+@dataclass
+class YacunpLLMModel:
+    """A handle to a loaded local LLM, passed between Local LLM nodes.
+
+    ``handle`` is a live backend object (e.g. a ``llama_cpp.Llama`` instance or
+    an LM Studio client descriptor) and is deliberately never serialized.
+    """
+
+    backend: str
+    name: str
+    handle: Any = None
+    config: dict[str, Any] = field(default_factory=dict)
+    multimodal: bool = False

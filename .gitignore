@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# YACUNP user-local config (kept out of version control; ship *.example.json)
+comfyui_yacunp/local_models.json
+comfyui_yacunp/system_prompts.json

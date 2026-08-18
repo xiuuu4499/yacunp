@@ -9,6 +9,12 @@ readme = "README.md"
 [project.urls]
 Repository = "https://github.com/xiuuu4499/yacunp"
 
+[project.optional-dependencies]
+# The Local LLM (llama.cpp) nodes need llama-cpp-python. Install a vision-capable
+# build for multimodal (mmproj) models. LM Studio nodes use only the standard
+# library. Backends are imported lazily, so the pack loads without these.
+llama = ["llama-cpp-python>=0.2.90"]
+
 [tool.comfy]
 # Replace with your ComfyUI registry publisher id before publishing.
 PublisherId = "REPLACE_WITH_PUBLISHER_ID"

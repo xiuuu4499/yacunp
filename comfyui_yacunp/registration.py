@@ -8,10 +8,12 @@ from __future__ import annotations
 
 from .nodes.dictionary import NODES as DICTIONARY_NODES
 from .nodes.json import NODES as JSON_NODES
+from .nodes.local_llm import NODES as LOCAL_LLM_NODES
 
 _CATEGORY_NODES = [
     DICTIONARY_NODES,
     JSON_NODES,
+    LOCAL_LLM_NODES,
 ]
 
 

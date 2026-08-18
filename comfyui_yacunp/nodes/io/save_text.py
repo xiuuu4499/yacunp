@@ -26,14 +26,17 @@ def write_text_file(
     prefix = _sanitize(filename_prefix, "yacunp")
     ext = _sanitize(extension, "txt").lstrip(".") or "txt"
     os.makedirs(directory, exist_ok=True)
-    filename = f"{prefix}.{ext}"
-    path = os.path.join(directory, filename)
-    counter = 1
-    while os.path.exists(path):
-        filename = f"{prefix}_{counter:03d}.{ext}"
+    counter = 0
+    while True:
+        suffix = "" if counter == 0 else f"_{counter:03d}"
+        filename = f"{prefix}{suffix}.{ext}"
         path = os.path.join(directory, filename)
-        counter += 1
-    with open(path, "w", encoding="utf-8") as handle:
+        try:
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            break
+        except FileExistsError:
+            counter += 1
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write("" if text is None else str(text))
     return path, filename
 

@@ -82,7 +82,13 @@ def generate(
     images: list[str],
     gen_args: dict[str, Any],
 ) -> tuple[str, dict[str, Any]]:
-    handle = model.handle or {}
+    if model.handle is None:
+        raise errors.YacunpError("The LM Studio model is not loaded.")
+    if images and not model.multimodal:
+        raise errors.YacunpError(
+            f"Model '{model.name}' is not configured for image input."
+        )
+    handle = model.handle
     base_url = handle.get("base_url", "http://localhost:1234/v1")
     payload: dict[str, Any] = {
         "model": handle.get("model", model.name),

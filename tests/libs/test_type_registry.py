@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 from yacunp.comfyui_yacunp.libs import errors, type_registry
-from yacunp.comfyui_yacunp.libs.custom_types import YacunpKVPair
+from yacunp.comfyui_yacunp.libs.custom_types import YacunpDictionary, YacunpKVPair
 
 
 def test_type_ids_include_core_types():
@@ -24,6 +24,14 @@ def test_has_widget_only_for_scalars():
 def test_io_factory_uses_slot_id():
     slot = type_registry.spec("STRING").io_factory("value")
     assert slot.id == "value"
+
+
+def test_io_factory_passes_input_options():
+    slot = type_registry.spec("STRING").io_factory(
+        "value", optional=True, force_input=True
+    )
+    assert slot.optional is True
+    assert slot.force_input is True
 
 
 @pytest.mark.parametrize(
@@ -93,3 +101,19 @@ def test_check_type_mismatch_raises():
 def test_unknown_type_raises():
     with pytest.raises(errors.YacunpError):
         type_registry.spec("NOT_A_TYPE")
+
+
+def test_from_text_builds_typed_dictionary():
+    value = type_registry.from_text(
+        "YACUNP_DICTIONARY",
+        '{"count": {"type": "INT", "value": 2}, "name": "Ada"}',
+    )
+    assert isinstance(value, YacunpDictionary)
+    assert value.items["count"].declared_type == "INT"
+    assert value.items["count"].value == 2
+    assert value.items["name"].declared_type == "ANY"
+
+
+def test_from_text_rejects_opaque_type():
+    with pytest.raises(errors.YacunpError, match="requires a connected value"):
+        type_registry.from_text("MODEL", '"model.safetensors"')

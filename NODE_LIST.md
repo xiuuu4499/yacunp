@@ -35,22 +35,25 @@ flow.
 ### Make KV Pair — `YACUNP_MakeKVPair`
 
 **Purpose:** Build a typed key/value pair. Selecting a type in the `type`
-dropdown reveals the matching value slot — a manual widget for scalar types, or a
-connection-only input for everything else.
+dropdown reveals an optional typed `value` connection and a `literal` text box.
+Connected values take precedence; otherwise the literal is converted to the
+selected type.
 
 | Direction | Name | Type | Notes |
 |---|---|---|---|
 | Input | `key` | `STRING` | The pair's key (connectable). |
-| Input | `type` | Dynamic combo | All registry types; selection exposes a `value` sub-input. |
+| Input | `type` | Dynamic combo | All registry types; selection exposes `value` and `literal` sub-inputs. |
 | Output | `kvpair` | `YACUNP_KVPAIR` | The assembled pair. |
 
-**Errors:** none at runtime (an unknown type cannot be selected).
+**Errors:** raises when a literal is invalid for the selected type. Opaque
+runtime types such as `IMAGE`, `MODEL`, and `LATENT` require a connection.
 
 ```mermaid
 flowchart LR
   K[key: STRING] --> M[Make KV Pair]
   T["type: DynamicCombo (all types)"] --> M
-  V["value (widget or connection,<br/>per selected type)"] --> M
+  V["value (optional typed connection)"] --> M
+  L["literal (text fallback)"] --> M
   M --> P[YACUNP_KVPAIR]
 ```
 
@@ -495,5 +498,4 @@ flowchart LR
   E[extension: STRING] --> S
   S --> P[path: STRING]
 ```
-
 

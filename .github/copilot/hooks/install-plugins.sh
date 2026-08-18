@@ -44,6 +44,10 @@ done < <(jq -r '
 # Install every plugin whose enabledPlugins entry is true.
 while IFS= read -r plugin; do
   [ -n "$plugin" ] || continue
+  # `plugin install` is a no-op ("already installed") for an existing plugin, so it
+  # never picks up a new marketplace revision. Uninstall first to force a reinstall
+  # from the freshly refreshed marketplace checkout.
+  copilot plugin uninstall "$plugin" >/dev/null 2>&1 || true
   copilot plugin install "$plugin" 2>&1 | grep -v 'already installed' || true
 done < <(jq -r '
   .enabledPlugins // {}

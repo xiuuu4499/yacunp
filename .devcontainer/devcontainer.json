@@ -1,0 +1,6 @@
+{
+  "name": "yacunp",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  // Runs as early as possible on every container/session start: refresh the CLI, then its plugins.
+  "postStartCommand": "bash .github/copilot/hooks/update-copilot-cli.sh && bash .github/copilot/hooks/install-plugins.sh"
+}

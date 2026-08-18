@@ -22,6 +22,7 @@ losslessly; they are represented as a **descriptor** dict of the form
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
@@ -93,8 +94,17 @@ def _opaque_to_text(type_id: str) -> Callable[[Any], str]:
 # --------------------------------------------------------------------------- #
 # io_factory builders (lazily import comfy_api so pure-logic imports are cheap)
 # --------------------------------------------------------------------------- #
-def _widget_factory(io_attr: str, **kwargs: Any) -> Callable[[str], Any]:
-    def factory(input_id: str) -> Any:
+def _widget_factory(io_attr: str, **defaults: Any) -> Callable[..., Any]:
+    def factory(input_id: str, **kwargs: Any) -> Any:
+        from comfy_api.latest import io
+
+        return getattr(io, io_attr).Input(input_id, **(defaults | kwargs))
+
+    return factory
+
+
+def _connection_factory(io_attr: str) -> Callable[..., Any]:
+    def factory(input_id: str, **kwargs: Any) -> Any:
         from comfy_api.latest import io
 
         return getattr(io, io_attr).Input(input_id, **kwargs)
@@ -102,29 +112,20 @@ def _widget_factory(io_attr: str, **kwargs: Any) -> Callable[[str], Any]:
     return factory
 
 
-def _connection_factory(io_attr: str) -> Callable[[str], Any]:
-    def factory(input_id: str) -> Any:
+def _custom_factory(type_string: str) -> Callable[..., Any]:
+    def factory(input_id: str, **kwargs: Any) -> Any:
         from comfy_api.latest import io
 
-        return getattr(io, io_attr).Input(input_id)
+        return io.Custom(type_string).Input(input_id, **kwargs)
 
     return factory
 
 
-def _custom_factory(type_string: str) -> Callable[[str], Any]:
-    def factory(input_id: str) -> Any:
+def _any_factory() -> Callable[..., Any]:
+    def factory(input_id: str, **kwargs: Any) -> Any:
         from comfy_api.latest import io
 
-        return io.Custom(type_string).Input(input_id)
-
-    return factory
-
-
-def _any_factory() -> Callable[[str], Any]:
-    def factory(input_id: str) -> Any:
-        from comfy_api.latest import io
-
-        return io.AnyType.Input(input_id)
+        return io.AnyType.Input(input_id, **kwargs)
 
     return factory
 
@@ -138,13 +139,13 @@ class TypeSpec:
 
     id: str
     has_widget: bool
-    _io_factory: Callable[[str], Any]
+    _io_factory: Callable[..., Any]
     _to_jsonable: Callable[[Any], Any]
     _from_jsonable: Callable[[Any], Any]
     _to_text: Callable[[Any], str]
 
-    def io_factory(self, input_id: str = "value") -> Any:
-        return self._io_factory(input_id)
+    def io_factory(self, input_id: str = "value", **kwargs: Any) -> Any:
+        return self._io_factory(input_id, **kwargs)
 
     def to_jsonable(self, value: Any) -> Any:
         return self._to_jsonable(value)
@@ -367,6 +368,112 @@ def to_jsonable(type_id: str, value: Any) -> Any:
 
 def from_jsonable(type_id: str, value: Any) -> Any:
     return spec(type_id).from_jsonable(value)
+
+
+def _literal_type_name(value: Any) -> str:
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, dict):
+        return "dictionary"
+    if isinstance(value, list):
+        return "array"
+    if isinstance(value, str):
+        return "string"
+    if isinstance(value, int):
+        return "integer"
+    if isinstance(value, float):
+        return "float"
+    if value is None:
+        return "null"
+    return type(value).__name__
+
+
+def _literal_mismatch(type_id: str, expected: str, value: Any) -> errors.YacunpError:
+    return errors.YacunpError(
+        f"Literal for '{type_id}' must decode to {expected}; "
+        f"got {_literal_type_name(value)}."
+    )
+
+
+def _convert_literal_value(type_id: str, value: Any) -> Any:
+    """Convert an already-decoded JSON value to a registry runtime value."""
+    spec(type_id)
+    if type_id == ANY:
+        return value
+    if type_id == "STRING":
+        if not isinstance(value, str):
+            raise _literal_mismatch(type_id, "a string", value)
+        return value
+    if type_id == "INT":
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise _literal_mismatch(type_id, "an integer", value)
+        return value
+    if type_id == "FLOAT":
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise _literal_mismatch(type_id, "a number", value)
+        return float(value)
+    if type_id == "BOOLEAN":
+        if not isinstance(value, bool):
+            raise _literal_mismatch(type_id, "a boolean", value)
+        return value
+    if type_id == "DICT":
+        if not isinstance(value, dict):
+            raise _literal_mismatch(type_id, "a JSON object", value)
+        return value
+    if type_id == "ARRAY":
+        if not isinstance(value, list):
+            raise _literal_mismatch(type_id, "a JSON array", value)
+        return value
+    if type_id == "YACUNP_KVPAIR":
+        if not isinstance(value, dict) or not {"key", "type", "value"} <= value.keys():
+            raise errors.YacunpError(
+                "Literal for 'YACUNP_KVPAIR' must be an object containing "
+                "'key', 'type', and 'value'."
+            )
+        declared_type = str(value["type"])
+        return YacunpKVPair(
+            key=str(value["key"]),
+            declared_type=declared_type,
+            value=_convert_literal_value(declared_type, value["value"]),
+        )
+    if type_id == "YACUNP_DICTIONARY":
+        if not isinstance(value, dict):
+            raise _literal_mismatch(type_id, "a JSON object", value)
+        items: OrderedDict[str, YacunpKVPair] = OrderedDict()
+        for key, raw_value in value.items():
+            if (
+                isinstance(raw_value, dict)
+                and "type" in raw_value
+                and "value" in raw_value
+            ):
+                declared_type = str(raw_value["type"])
+                converted = _convert_literal_value(declared_type, raw_value["value"])
+            else:
+                declared_type = ANY
+                converted = raw_value
+            pair_key = str(key)
+            items[pair_key] = YacunpKVPair(pair_key, declared_type, converted)
+        return YacunpDictionary(items)
+    raise errors.YacunpError(
+        f"Type '{type_id}' requires a connected value; it cannot be created from text."
+    )
+
+
+def from_text(type_id: str, text: str) -> Any:
+    """Parse a Make KV Pair literal for ``type_id``.
+
+    STRING consumes the text verbatim. Other supported literal types use JSON
+    syntax so booleans, numbers, arrays, dictionaries, and null are unambiguous.
+    Opaque ComfyUI runtime types require a connected value.
+    """
+    spec(type_id)
+    if type_id == "STRING":
+        return str(text)
+
+    from . import json_codec
+
+    decoded = json_codec.decode(str(text))
+    return _convert_literal_value(type_id, decoded)
 
 
 def to_text(type_id: str, value: Any) -> str:

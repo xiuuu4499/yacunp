@@ -11,11 +11,20 @@ declared in [`.github/copilot/settings.json`](../copilot/settings.json). Always
 make that plugin's skills available before doing ComfyUI work, then rely on them
 as the source of truth.
 
-## First: install the plugin and its skills
+## First: make sure the plugin's skills are available
 
-The plugins in `.github/copilot/settings.json` are **not installed
-automatically**. At the start of a session, before any ComfyUI task, run the
-repository hook scripts:
+Supported Copilot clients read [`.github/copilot/settings.json`](../copilot/settings.json)
+and **auto-install** every plugin whose `enabledPlugins` entry is `true`
+(currently `comfyui-custom-nodes@comfyui-custom-node-skills`), so normally no
+setup is needed. Confirm the skills loaded:
+
+```bash
+copilot plugin list
+/skills list
+```
+
+If the `comfyui-node-*` skills are missing (an older client that does not honor
+`enabledPlugins`), run the repository hook scripts as a compatibility fallback:
 
 ```bash
 bash .github/copilot/hooks/update-copilot-cli.sh
@@ -26,18 +35,10 @@ bash .github/copilot/hooks/install-plugins.sh
   cloud agent may ship a stale copy bundled with the VS Code extension).
 - `install-plugins.sh` reads `settings.json`, registers every marketplace under
   `extraKnownMarketplaces` at its declared `ref`, and installs every plugin
-  whose `enabledPlugins` entry is `true` — currently
-  `comfyui-custom-nodes@comfyui-custom-node-skills`.
+  whose `enabledPlugins` entry is `true`.
 
-Then confirm the skills loaded:
-
-```bash
-copilot plugin list
-/skills list
-```
-
-Installing a plugin mid-session may not retroactively load its skills, so if the
-`comfyui-node-*` skills are not listed, start a new session after installing.
+Installing a plugin mid-session may not retroactively load its skills, so if they
+are still missing after the fallback, start a new session.
 
 ## Then: use the skills
 

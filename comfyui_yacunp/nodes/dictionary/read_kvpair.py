@@ -13,7 +13,7 @@ class YacunpReadKVPair(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_ReadKVPair",
-            display_name="Read KV Pair (YACUNP)",
+            display_name="Read KV Pair",
             category="YACUNP/Dictionary",
             description="Split a key/value pair back into its key and value. "
             "The selected type must match the pair's declared type.",

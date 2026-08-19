@@ -39,7 +39,7 @@ GEN_KEYS = frozenset(
         "repeat_penalty",
         "presence_penalty",
         "frequency_penalty",
-        "stop",
+        "stop_sequence",
     }
 )
 

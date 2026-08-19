@@ -47,7 +47,7 @@ pytest -q
 
 Keep nodes thin and test reusable logic independently. Follow the repository
 layout and conventions in [DEVELOPMENT.md](DEVELOPMENT.md), including stable
-`YACUNP_` node IDs, `(YACUNP)` display names, and documentation in
+`YACUNP_` node IDs, plain user-facing display names, and documentation in
 `NODE_LIST.md` for new nodes.
 
 ## GitHub and pull requests

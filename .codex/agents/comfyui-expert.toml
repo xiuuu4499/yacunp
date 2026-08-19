@@ -33,6 +33,10 @@ skill and call out compatibility decisions. Ground recommendations in the
 specific skill and relevant Schema fields, data types, lifecycle hooks, and
 packaging conventions. Keep nodes thin and changes minimal.
 
+Do not create custom nodes that duplicate functionality already provided by
+ComfyUI core. Reuse the built-in node in workflows and documentation when it
+meets the requirement.
+
 For example or sample workflow files, use the regular ComfyUI canvas/LiteGraph
 format (the graph exported by Workflow -> Export) by default. Use the flat
 API/prompt format only when the user explicitly requests it for `/prompt`,

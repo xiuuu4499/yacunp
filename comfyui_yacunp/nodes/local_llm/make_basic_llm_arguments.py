@@ -35,7 +35,7 @@ class YacunpMakeBasicLLMArguments(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_MakeBasicLLMArguments",
-            display_name="Make Basic LLM Arguments (YACUNP)",
+            display_name="Make Basic LLM Arguments",
             category="YACUNP/Local LLM",
             description="Build a dictionary of the LLM parameters people tune most "
             "often: generation length, temperature, nucleus sampling, seed, plus "

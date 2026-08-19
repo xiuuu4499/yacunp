@@ -14,7 +14,7 @@ class YacunpMakeAdvancedLLMArguments(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_MakeAdvancedLLMArguments",
-            display_name="Make Advanced LLM Arguments (YACUNP)",
+            display_name="Make Advanced LLM Arguments",
             category="YACUNP/Local LLM",
             description="Build a dictionary of the less common LLM knobs: top_k / "
             "min_p sampling, repetition/presence/frequency penalties, batch and "

@@ -40,7 +40,7 @@ class YacunpMakeKVPair(io.ComfyNode):
             )
         return io.Schema(
             node_id="YACUNP_MakeKVPair",
-            display_name="Make KV Pair (YACUNP)",
+            display_name="Make KV Pair",
             category="YACUNP/Dictionary",
             description="Build a typed key/value pair from a connected value or "
             "a text literal converted to the selected type.",

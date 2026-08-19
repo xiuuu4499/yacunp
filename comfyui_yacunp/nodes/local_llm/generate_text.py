@@ -26,7 +26,7 @@ class YacunpGenerateText(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_GenerateText",
-            display_name="Generate Text (YACUNP)",
+            display_name="Generate Text",
             category="YACUNP/Local LLM",
             description="Run text generation on a loaded local model (llama.cpp or "
             "LM Studio). Takes the model, the prompt, an optional system prompt, an "

@@ -18,7 +18,7 @@ class YacunpFormatJSON(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_FormatJSON",
-            display_name="Format JSON (YACUNP)",
+            display_name="Format JSON",
             category="YACUNP/JSON",
             description="Re-serialize a JSON string as either a single line or "
             "pretty-printed text.",

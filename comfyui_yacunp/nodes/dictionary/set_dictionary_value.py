@@ -36,7 +36,7 @@ class YacunpSetDictionaryValue(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_SetDictionaryValue",
-            display_name="Set Dictionary Value (YACUNP)",
+            display_name="Set Dictionary Value",
             category="YACUNP/Dictionary",
             description="Insert or update a key/value pair in a dictionary. "
             "Returns a new dictionary; the input is left unchanged. "

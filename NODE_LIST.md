@@ -221,23 +221,21 @@ flowchart LR
 
 ### Make JSON — `YACUNP_MakeJSON`
 
-**Purpose:** Encode any connected values into a pretty-printed JSON **array**.
-KV pairs and dictionaries are serialized structurally; tensor-backed values
-become descriptor dicts.
+**Purpose:** Encode one connected value into pretty-printed JSON while
+preserving its root type. KV pairs and dictionaries are serialized structurally;
+tensor-backed values become descriptor dicts.
 
 | Direction | Name | Type | Notes |
 |---|---|---|---|
-| Input | `values` | Autogrow of `ANY` | One value per slot; `None` slots are skipped. |
-| Output | `json` | `STRING` | Pretty-printed JSON array. |
+| Input | `value` | `ANY` | The single value to encode. Lists remain arrays and dictionaries remain objects. |
+| Output | `json` | `STRING` | Pretty-printed JSON preserving the input root type. |
 
 **Errors:** none (any value is best-effort serializable via the registry).
 
 ```mermaid
 flowchart LR
-  V0[value_0] --> M[Make JSON]
-  V1[value_1] --> M
-  VN[value_n ...] --> M
-  M --> J["json: STRING (pretty array)"]
+  V[value: ANY] --> M[Make JSON]
+  M --> J["json: STRING (pretty JSON)"]
 ```
 
 ### Convert JSON — `YACUNP_ConvertJSON`
@@ -336,14 +334,14 @@ explanatory tooltip.
 | Input | `n_threads` | `INT` | CPU threads (load-time). |
 | Input | `flash_attn` | `BOOLEAN` | Enable FlashAttention (load-time). |
 | Input | `image_max_tokens` | `INT` | Per-image token budget for mmproj (load-time). |
-| Input | `stop` | `STRING` | Optional stop sequence (generation-time). |
+| Input | `stop_sequence` | `STRING` | Optional stop sequence (generation-time). |
 | Output | `arguments` | `YACUNP_DICTIONARY` | The assembled arguments. |
 
 **Errors:** none. Combine with Basic arguments via **Combine Dictionaries**.
 
 ```mermaid
 flowchart LR
-  A["top_k, min_p, penalties,<br/>n_batch, n_threads, flash_attn,<br/>image_max_tokens, stop"] --> M[Make Advanced LLM Arguments]
+  A["top_k, min_p, penalties,<br/>n_batch, n_threads, flash_attn,<br/>image_max_tokens, stop_sequence"] --> M[Make Advanced LLM Arguments]
   M --> D[arguments: YACUNP_DICTIONARY]
 ```
 
@@ -472,30 +470,3 @@ flowchart LR
 ```
 
 ---
-
-## Category: `YACUNP/IO`
-
-### Save Text — `YACUNP_SaveText`
-
-**Purpose:** Write a string to a file in the ComfyUI output directory — for
-example generated text as `.txt`, or serialized JSON metadata as `.json`. Runs
-as an output node.
-
-| Direction | Name | Type | Notes |
-|---|---|---|---|
-| Input | `text` | `STRING` (multiline) | Content to write. |
-| Input | `filename_prefix` | `STRING` | Base filename (sanitized to a bare name). |
-| Input | `extension` | `STRING` | File extension, e.g. `txt` or `json`. |
-| Output | `path` | `STRING` | Absolute path of the written file. |
-
-**Errors:** none in normal operation. The prefix/extension are sanitized to keep
-writes inside the output directory; an existing name gets a numeric suffix.
-
-```mermaid
-flowchart LR
-  T[text: STRING] --> S[Save Text]
-  FP[filename_prefix: STRING] --> S
-  E[extension: STRING] --> S
-  S --> P[path: STRING]
-```
-

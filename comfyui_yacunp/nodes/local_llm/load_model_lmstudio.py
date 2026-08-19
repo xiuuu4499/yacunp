@@ -44,7 +44,7 @@ class YacunpLoadModelLMStudio(io.ComfyNode):
         base_url = config.lmstudio_base_url(config.load_catalog())
         return io.Schema(
             node_id="YACUNP_LoadModelLMStudio",
-            display_name="Load Model (LM Studio) (YACUNP)",
+            display_name="Load Model (LM Studio)",
             category="YACUNP/Local LLM",
             description="Point at a running LM Studio server (OpenAI-compatible "
             "local API) and select a model it already exposes. No downloads are "

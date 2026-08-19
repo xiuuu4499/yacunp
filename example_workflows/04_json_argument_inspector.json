@@ -1,6 +1,6 @@
 {
-  "last_node_id": 10,
-  "last_link_id": 9,
+  "last_node_id": 11,
+  "last_link_id": 10,
   "nodes": [
     {
       "id": 1,
@@ -83,6 +83,51 @@
       "title": "Advanced LLM Arguments"
     },
     {
+      "id": 11,
+      "type": "YACUNP_CombineDictionaries",
+      "pos": [
+        720,
+        220
+      ],
+      "size": [
+        300,
+        130
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "dict_0",
+          "type": "YACUNP_DICTIONARY",
+          "link": 1
+        },
+        {
+          "name": "dict_1",
+          "type": "YACUNP_DICTIONARY",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "dictionary",
+          "type": "YACUNP_DICTIONARY",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "YACUNP_CombineDictionaries"
+      },
+      "widgets_values": [
+        "keep_last",
+        " "
+      ],
+      "title": "Combine arguments"
+    },
+    {
       "id": 3,
       "type": "YACUNP_MakeJSON",
       "pos": [
@@ -94,18 +139,13 @@
         130
       ],
       "flags": {},
-      "order": 2,
+      "order": 3,
       "mode": 0,
       "inputs": [
         {
-          "name": "value_0",
+          "name": "value",
           "type": "*",
-          "link": 1
-        },
-        {
-          "name": "value_1",
-          "type": "*",
-          "link": 2
+          "link": 10
         }
       ],
       "outputs": [
@@ -122,7 +162,7 @@
       "properties": {
         "Node name for S&R": "YACUNP_MakeJSON"
       },
-      "title": "Arguments -> JSON array"
+      "title": "Arguments -> JSON object"
     },
     {
       "id": 4,
@@ -136,7 +176,7 @@
         130
       ],
       "flags": {},
-      "order": 3,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
@@ -169,7 +209,7 @@
     },
     {
       "id": 5,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         1400,
         40
@@ -179,28 +219,25 @@
         130
       ],
       "flags": {},
-      "order": 4,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
           "name": "text",
           "type": "STRING",
-          "link": 4,
-          "widget": {
-            "name": "text"
-          }
+          "link": 4
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "llm_arguments",
@@ -220,7 +257,7 @@
         130
       ],
       "flags": {},
-      "order": 5,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
@@ -252,7 +289,7 @@
     },
     {
       "id": 7,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         380,
         280
@@ -262,28 +299,25 @@
         130
       ],
       "flags": {},
-      "order": 6,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
           "name": "text",
           "type": "STRING",
-          "link": 6,
-          "widget": {
-            "name": "text"
-          }
+          "link": 6
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "llm_arguments_min",
@@ -303,7 +337,7 @@
         130
       ],
       "flags": {},
-      "order": 7,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -329,7 +363,7 @@
         "Node name for S&R": "YACUNP_ConvertJSON"
       },
       "widgets_values": [
-        "list"
+        "dictionary"
       ],
       "title": "Parse JSON back to a value"
     },
@@ -345,11 +379,11 @@
         130
       ],
       "flags": {},
-      "order": 8,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
-          "name": "value_0",
+          "name": "value",
           "type": "*",
           "link": 8
         }
@@ -371,7 +405,7 @@
     },
     {
       "id": 10,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         1400,
         280
@@ -381,28 +415,25 @@
         130
       ],
       "flags": {},
-      "order": 9,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
           "name": "text",
           "type": "STRING",
-          "link": 9,
-          "widget": {
-            "name": "text"
-          }
+          "link": 9
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "llm_arguments_roundtrip",
@@ -416,17 +447,17 @@
       1,
       1,
       0,
-      3,
+      11,
       0,
-      "*"
+      "YACUNP_DICTIONARY"
     ],
     [
       2,
       2,
       0,
-      3,
+      11,
       1,
-      "*"
+      "YACUNP_DICTIONARY"
     ],
     [
       3,
@@ -483,6 +514,14 @@
       10,
       0,
       "STRING"
+    ],
+    [
+      10,
+      11,
+      0,
+      3,
+      0,
+      "YACUNP_DICTIONARY"
     ]
   ],
   "groups": [],

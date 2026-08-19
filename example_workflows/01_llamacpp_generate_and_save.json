@@ -283,7 +283,7 @@
     },
     {
       "id": 7,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         380,
         280
@@ -299,22 +299,19 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 7,
-          "widget": {
-            "name": "text"
-          }
+          "link": 7
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "local_llm_output",
@@ -338,7 +335,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "value_0",
+          "name": "value",
           "type": "*",
           "link": 8
         }
@@ -356,11 +353,11 @@
       "properties": {
         "Node name for S&R": "YACUNP_MakeJSON"
       },
-      "title": "Metadata -> JSON"
+      "title": "Metadata -> JSON object"
     },
     {
       "id": 9,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         1060,
         280
@@ -376,22 +373,19 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 9,
-          "widget": {
-            "name": "text"
-          }
+          "link": 9
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "local_llm_metadata",

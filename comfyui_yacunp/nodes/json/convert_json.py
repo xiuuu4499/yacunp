@@ -57,7 +57,7 @@ class YacunpConvertJSON(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_ConvertJSON",
-            display_name="Convert JSON (YACUNP)",
+            display_name="Convert JSON",
             category="YACUNP/JSON",
             description="Parse a JSON string into a nested Python value, validating "
             "the top-level type against the selected root type.",

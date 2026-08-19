@@ -22,7 +22,7 @@ class YacunpGetDictionaryValue(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_GetDictionaryValue",
-            display_name="Get Dictionary Value (YACUNP)",
+            display_name="Get Dictionary Value",
             category="YACUNP/Dictionary",
             description="Look up a value by key. Errors if the key is missing or "
             "the stored type does not match the selected type.",

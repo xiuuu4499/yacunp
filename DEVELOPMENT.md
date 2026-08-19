@@ -103,12 +103,16 @@ Both must pass; CI runs exactly these two commands.
    `type_registry` / `json_codec`.
 2. Append the class to that package's `NODES` list in the category
    `__init__.py` (e.g. `comfyui_yacunp/nodes/dictionary/__init__.py`).
-3. Choose a stable, globally unique `node_id` prefixed with `YACUNP_`, a
-   `display_name` ending in `(YACUNP)`, and a `category` of `YACUNP/<Category>`.
-   Never change a released `node_id`.
+3. Choose a stable, globally unique `node_id` prefixed with `YACUNP_`, a plain
+   user-facing `display_name`, and a `category` of `YACUNP/<Category>`. Never
+   change a released `node_id`.
 4. Add a test module under the matching `tests/<category>/` folder that calls
    `MyNode.execute(...)` with plain values and asserts on outputs / errors.
 5. Document the node in [NODE_LIST.md](NODE_LIST.md).
+
+Do not create a custom node that duplicates functionality already provided by
+ComfyUI core. Reuse the built-in node in examples and documentation when the
+core implementation meets the need.
 
 `registration.all_nodes()` picks up every category's `NODES` automatically, so
 no central list needs editing.

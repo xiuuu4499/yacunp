@@ -65,6 +65,9 @@ before answering instead of guessing:
   it registers and publishes correctly.
 - Keep changes minimal and idiomatic to ComfyUI; do not invent APIs that the
   skills do not document.
+- Do not create custom nodes that duplicate functionality already provided by
+  ComfyUI core. Reuse the built-in node in workflows and documentation when it
+  meets the requirement.
 
 ## Sample workflows: prefer the regular canvas format
 

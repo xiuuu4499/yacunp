@@ -22,16 +22,16 @@ canvas and edit them. Load one in ComfyUI (drag the file onto the canvas, or use
 - **JSON workflow (04):** no model or extra dependency required.
 
 Saved files (text and JSON) are written to your ComfyUI `output/` directory by
-the *Save Text* nodes.
+ComfyUI’s built-in *Save Text* nodes.
 
 ## The workflows
 
 | File | Exercises |
 |---|---|
-| `01_llamacpp_generate_and_save.json` | Basic + Advanced arguments → Combine Dictionaries → Load Model (llama.cpp) → System Prompt Presets → Generate Text → Save Text (.txt) + Make JSON metadata → Save Text (.json) → Unload Model. |
-| `02_lmstudio_vision_describe.json` | Load Image → Load Model (LM Studio) → Describe-Image preset → Generate Text with an image (multimodal) → Save Text → Unload Model. |
-| `03_dictionary_prompt_builder.json` | Make KV Pair, Make Dictionary, Set Dictionary Value, Get Dictionary Keys / Value, Read KV Pair, Format Text With Dictionary → build a prompt → Generate Text → Save Text, plus a JSON debug dump. |
-| `04_json_argument_inspector.json` | Make JSON, Format JSON (pretty + single line), Convert JSON round-trip on argument dictionaries → Save Text (.json). |
+| `01_llamacpp_generate_and_save.json` | Basic + Advanced arguments → Combine Dictionaries → Load Model (llama.cpp) → System Prompt Presets → Generate Text → built-in Save Text (.txt) + Make JSON metadata → built-in Save Text (.json) → Unload Model. |
+| `02_lmstudio_vision_describe.json` | Load Image → Load Model (LM Studio) → Describe-Image preset → Generate Text with an image (multimodal) → built-in Save Text → Unload Model. |
+| `03_dictionary_prompt_builder.json` | Make KV Pair, Make Dictionary, Set Dictionary Value, Get Dictionary Keys / Value, Read KV Pair, Format Text With Dictionary → build a prompt → Generate Text → built-in Save Text, plus a JSON debug dump. |
+| `04_json_argument_inspector.json` | Make JSON, Format JSON (pretty + single line), Convert JSON round-trip on a combined argument dictionary → built-in Save Text (.json). |
 
 ## Notes
 
@@ -39,9 +39,9 @@ the *Save Text* nodes.
   String** nodes (the `key` input is connection-only). If your ComfyUI build
   names that node differently, swap in any node that outputs a `STRING`.
 - Some YACUNP inputs are **dynamic** (the Make KV Pair *type* selector, and the
-  auto-growing pair/dictionary/value slots on Make Dictionary, Combine
-  Dictionaries, and Make JSON). If your ComfyUI frontend version renders these
-  differently, re-touch the affected node on the canvas (re-pick the type, or
-  reconnect the growing inputs) and re-save.
+  auto-growing pair/dictionary slots on Make Dictionary and Combine
+  Dictionaries). Make JSON accepts one value; pass a list when an array root
+  is desired. If your ComfyUI frontend version renders dynamic inputs
+  differently, re-touch the affected node on the canvas and re-save.
 - The *Unload Model* nodes take an optional `signal` input wired to the generated
   text purely to force them to run **after** generation.

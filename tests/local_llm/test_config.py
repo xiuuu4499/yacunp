@@ -100,10 +100,20 @@ def test_merge_args_override_wins():
 
 def test_split_args_partitions_load_and_gen():
     load_args, gen_args = config.split_args(
-        {"n_ctx": 4096, "n_gpu_layers": -1, "temperature": 0.7, "max_tokens": 128}
+        {
+            "n_ctx": 4096,
+            "n_gpu_layers": -1,
+            "temperature": 0.7,
+            "max_tokens": 128,
+            "stop_sequence": "</end>",
+        }
     )
     assert load_args == {"n_ctx": 4096, "n_gpu_layers": -1}
-    assert gen_args == {"temperature": 0.7, "max_tokens": 128}
+    assert gen_args == {
+        "temperature": 0.7,
+        "max_tokens": 128,
+        "stop_sequence": "</end>",
+    }
 
 
 def test_lmstudio_base_url_prefers_override(tmp_path):
@@ -155,4 +165,3 @@ def test_lmstudio_catalog_defaults_returns_empty_on_no_match(tmp_path):
     )
     assert config.lmstudio_catalog_defaults(catalog, "http://localhost:1234/v1", "other") == {}
     assert config.lmstudio_catalog_defaults(catalog, "http://other:1/v1", "my-model") == {}
-

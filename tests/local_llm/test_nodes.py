@@ -6,7 +6,7 @@ import pytest
 from yacunp.comfyui_yacunp.libs import errors
 from yacunp.comfyui_yacunp.libs.custom_types import YacunpDictionary, YacunpLLMModel
 from yacunp.comfyui_yacunp.libs.local_llm import args, backends, config
-from yacunp.comfyui_yacunp.libs.local_llm.backends import lmstudio
+from yacunp.comfyui_yacunp.libs.local_llm.backends import llama_cpp, lmstudio
 from yacunp.comfyui_yacunp.nodes.local_llm import (
     generate_text,
     load_model_llama_cpp,
@@ -42,6 +42,52 @@ def test_generate_text_dispatches_and_returns_info(monkeypatch):
     assert (system, prompt, images) == ("sys", "hi", [])
     assert gen_args["temperature"] == 0.3
     assert "n_ctx" not in gen_args  # load-time keys are filtered out
+
+
+def test_llama_backend_translates_stop_sequence_to_stop():
+    calls = []
+
+    class _FakeHandle:
+        def create_chat_completion(self, **payload):
+            calls.append(payload)
+            return {"choices": [{"message": {"content": "done"}}]}
+
+    model = YacunpLLMModel(backend="llama_cpp", name="m", handle=_FakeHandle())
+    llama_cpp.generate(
+        model=model,
+        system="",
+        prompt="hi",
+        images=[],
+        gen_args={"stop_sequence": "</end>"},
+    )
+
+    assert calls[0]["stop"] == ["</end>"]
+    assert "stop_sequence" not in calls[0]
+
+
+def test_lmstudio_backend_translates_stop_sequence_to_stop(monkeypatch):
+    requests = []
+
+    def fake_request(url, payload=None, timeout=120.0):
+        requests.append((url, payload))
+        return {"choices": [{"message": {"content": "done"}}]}
+
+    monkeypatch.setattr(lmstudio, "_request", fake_request)
+    model = YacunpLLMModel(
+        backend="lmstudio",
+        name="m",
+        handle={"base_url": "http://host:1/v1", "model": "m"},
+    )
+    lmstudio.generate(
+        model=model,
+        system="",
+        prompt="hi",
+        images=[],
+        gen_args={"stop_sequence": "</end>"},
+    )
+
+    assert requests[0][1]["stop"] == ["</end>"]
+    assert "stop_sequence" not in requests[0][1]
 
 
 def test_load_model_llama_cpp_splits_load_args(monkeypatch):
@@ -320,5 +366,3 @@ def test_llama_cpp_reuses_cached_handle(monkeypatch, _clear_cache):
     r2 = load_model_llama_cpp.YacunpLoadModelLlamaCpp.execute(model="m")
     assert r1.args[0] is r2.args[0]
     assert len(load_calls) == 1
-
-

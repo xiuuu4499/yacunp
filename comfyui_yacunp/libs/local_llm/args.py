@@ -52,7 +52,12 @@ BASIC_ARG_SPECS: list[dict[str, Any]] = [
         "name": "seed",
         "type": "INT",
         "default": 0,
-        "io": {"min": 0, "max": 2**63 - 1, "step": 1},
+        "io": {
+            "min": 0,
+            "max": 2**63 - 1,
+            "step": 1,
+            "control_after_generate": False,
+        },
         "description": (
             "Random seed for sampling. Reuse the same seed with identical inputs "
             "to reproduce a result. Backends commonly treat 0 as 'pick a fresh "
@@ -181,7 +186,7 @@ ADVANCED_ARG_SPECS: list[dict[str, Any]] = [
         ),
     },
     {
-        "name": "stop",
+        "name": "stop_sequence",
         "type": "STRING",
         "default": "",
         "io": {},

@@ -7,9 +7,9 @@ from comfy_api.latest import io
 from ...libs import json_codec
 
 
-def make_json(slots) -> str:
-    values = [value for value in slots.values() if value is not None]
-    return json_codec.encode(values, style=json_codec.PRETTY)
+def make_json(value) -> str:
+    """Encode one workflow value while preserving its JSON root type."""
+    return json_codec.encode(value, style=json_codec.PRETTY)
 
 
 class YacunpMakeJSON(io.ComfyNode):
@@ -17,24 +17,15 @@ class YacunpMakeJSON(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_MakeJSON",
-            display_name="Make JSON (YACUNP)",
+            display_name="Make JSON",
             category="YACUNP/JSON",
-            description="Encode any connected values into a pretty-printed JSON "
-            "array. KV pairs and dictionaries are serialized structurally.",
-            inputs=[
-                io.Autogrow.Input(
-                    "values",
-                    template=io.Autogrow.TemplatePrefix(
-                        input=io.AnyType.Input("value"),
-                        prefix="value_",
-                        min=1,
-                        max=32,
-                    ),
-                )
-            ],
+            description="Encode one connected value as pretty-printed JSON while "
+            "preserving its root type. KV pairs and dictionaries are serialized "
+            "structurally.",
+            inputs=[io.AnyType.Input("value")],
             outputs=[io.String.Output("json")],
         )
 
     @classmethod
-    def execute(cls, values) -> io.NodeOutput:
-        return io.NodeOutput(make_json(values))
+    def execute(cls, value) -> io.NodeOutput:
+        return io.NodeOutput(make_json(value))

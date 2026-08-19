@@ -234,7 +234,7 @@
     },
     {
       "id": 6,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         40,
         280
@@ -250,22 +250,19 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 5,
-          "widget": {
-            "name": "text"
-          }
+          "link": 5
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "image_description",

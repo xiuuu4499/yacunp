@@ -21,7 +21,7 @@ class YacunpSystemPromptPresets(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_SystemPromptPresets",
-            display_name="System Prompt Presets (YACUNP)",
+            display_name="System Prompt Presets",
             category="YACUNP/Local LLM",
             description="Pick a ready-made system prompt grouped by purpose "
             "(long-form text, image prompt, video prompt, prompt adjustment, "

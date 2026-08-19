@@ -42,7 +42,7 @@ class YacunpUnloadModel(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_UnloadModel",
-            display_name="Unload Model / VRAM Cleanup (YACUNP)",
+            display_name="Unload Model / VRAM Cleanup",
             category="YACUNP/Local LLM",
             description="Free a loaded model and run a VRAM/RAM cleanup pass "
             "(garbage collection and, if available, CUDA cache clear). Connect the "

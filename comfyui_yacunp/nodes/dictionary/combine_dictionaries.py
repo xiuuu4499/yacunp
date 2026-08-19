@@ -83,7 +83,7 @@ class YacunpCombineDictionaries(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_CombineDictionaries",
-            display_name="Combine Dictionaries (YACUNP)",
+            display_name="Combine Dictionaries",
             category="YACUNP/Dictionary",
             description="Merge two or more dictionaries into one. The collision "
             "mode decides what happens when a key appears more than once: "

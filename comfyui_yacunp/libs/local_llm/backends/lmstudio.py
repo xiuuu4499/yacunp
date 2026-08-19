@@ -159,8 +159,8 @@ def generate(
         payload["frequency_penalty"] = float(gen_args["frequency_penalty"])
     if gen_args.get("seed") not in (None, 0):
         payload["seed"] = int(gen_args["seed"])
-    if gen_args.get("stop"):
-        payload["stop"] = [str(gen_args["stop"])]
+    if gen_args.get("stop_sequence"):
+        payload["stop"] = [str(gen_args["stop_sequence"])]
 
     result = _request(f"{base_url}/chat/completions", payload)
     choice = (result.get("choices") or [{}])[0]

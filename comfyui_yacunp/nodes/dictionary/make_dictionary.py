@@ -52,7 +52,7 @@ class YacunpMakeDictionary(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_MakeDictionary",
-            display_name="Make Dictionary (YACUNP)",
+            display_name="Make Dictionary",
             category="YACUNP/Dictionary",
             description="Combine one or more key/value pairs into a dictionary. "
             "Duplicate keys raise an error.",

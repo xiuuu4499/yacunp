@@ -165,8 +165,8 @@ def generate(
         call["frequency_penalty"] = float(gen_args["frequency_penalty"])
     if gen_args.get("seed") not in (None, 0):
         call["seed"] = int(gen_args["seed"])
-    if gen_args.get("stop"):
-        call["stop"] = [str(gen_args["stop"])]
+    if gen_args.get("stop_sequence"):
+        call["stop"] = [str(gen_args["stop_sequence"])]
 
     result = model.handle.create_chat_completion(**call)
     choice = (result.get("choices") or [{}])[0]

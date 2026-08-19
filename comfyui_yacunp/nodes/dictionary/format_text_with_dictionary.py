@@ -31,7 +31,7 @@ class YacunpFormatTextWithDictionary(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_FormatTextWithDictionary",
-            display_name="Format Text With Dictionary (YACUNP)",
+            display_name="Format Text With Dictionary",
             category="YACUNP/Dictionary",
             description="Replace {key} placeholders in a text template with the "
             "string form of each dictionary value.",

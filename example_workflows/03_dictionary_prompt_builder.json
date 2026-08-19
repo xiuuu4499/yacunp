@@ -567,7 +567,7 @@
     },
     {
       "id": 14,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         1060,
         520
@@ -583,22 +583,19 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 17,
-          "widget": {
-            "name": "text"
-          }
+          "link": 17
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "enhanced_prompt",
@@ -622,19 +619,9 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "value_0",
+          "name": "value",
           "type": "*",
           "link": 18
-        },
-        {
-          "name": "value_1",
-          "type": "*",
-          "link": 19
-        },
-        {
-          "name": "value_2",
-          "type": "*",
-          "link": 20
         }
       ],
       "outputs": [
@@ -650,11 +637,11 @@
       "properties": {
         "Node name for S&R": "YACUNP_MakeJSON"
       },
-      "title": "Debug: keys + values -> JSON"
+      "title": "Debug: dictionary keys -> JSON array"
     },
     {
       "id": 16,
-      "type": "YACUNP_SaveText",
+      "type": "SaveText",
       "pos": [
         40,
         760
@@ -670,22 +657,19 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 21,
-          "widget": {
-            "name": "text"
-          }
+          "link": 21
         }
       ],
       "outputs": [
         {
-          "name": "path",
+          "name": "text",
           "type": "STRING",
           "links": null,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "YACUNP_SaveText"
+        "Node name for S&R": "SaveText"
       },
       "widgets_values": [
         "dictionary_debug",
@@ -936,22 +920,6 @@
       0,
       15,
       0,
-      "*"
-    ],
-    [
-      19,
-      7,
-      0,
-      15,
-      1,
-      "*"
-    ],
-    [
-      20,
-      9,
-      1,
-      15,
-      2,
       "*"
     ],
     [

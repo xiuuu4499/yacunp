@@ -42,7 +42,7 @@ class YacunpLoadModelLlamaCpp(io.ComfyNode):
     def define_schema(cls) -> io.Schema:
         return io.Schema(
             node_id="YACUNP_LoadModelLlamaCpp",
-            display_name="Load Model (llama.cpp) (YACUNP)",
+            display_name="Load Model (llama.cpp)",
             category="YACUNP/Local LLM",
             description="Load a local GGUF model with llama.cpp. Models are defined "
             "in local_models.json (no downloads are ever performed). Optional "
